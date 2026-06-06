@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="badge">OCR GCSE Art &amp; Design — Printmaking</div>
+    <h1>Printmaking Techniques</h1>
+    <p>Interactive revision guide · Silkscreen, Block, Monoprinting &amp; Etching</p>
+  </div>
+  <a href="index.html" class="home-link">← 🏡 Home</a>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" onclick="switchTab('learn',this)">📚 Key Learning</button>
+  <button class="tab-btn" onclick="switchTab('mcq',this)">❓ MCQ Quiz</button>
+  <button class="tab-btn" onclick="switchTab('matching',this)">🔗 Matching</button>
+  <button class="tab-btn" onclick="switchTab('fib',this)">✏️ Fill the Blanks</button>
+  <button class="tab-btn" onclick="switchTab('misconceptions',this)">⚠️ Misconceptions</button>
+  <button class="tab-btn" onclick="switchTab('examtips',this)">🎯 Exam Tips</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('truefalse',this)">✅ True / False</button>
+  <button class="tab-btn" onclick="switchTab('exampractice',this)">📝 Exam Practice</button>
+</nav>
+
+<main>
+  <!-- KEY LEARNING -->
+  <div class="tab-panel active" id="tab-learn">
+    <h2 class="section-title">Key Learning Topics</h2>
+    <p class="section-sub">Double-click any card to expand detailed notes.</p>
+    <div class="topic-grid" id="topicGrid"></div>
+  </div>
+  <!-- MCQ -->
+  <div class="tab-panel" id="tab-mcq">
+    <h2 class="section-title">Multiple Choice Questions</h2>
+    <p class="section-sub">Select an answer to reveal instant feedback.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="mcqScore">0</div><div style="font-size:12px;color:var(--mid)">correct answers</div></div>
+      <div style="font-size:13px;color:var(--mid)">out of <strong id="mcqTotal">0</strong> attempted</div>
+      <button class="reset-btn" onclick="resetMCQ()">RESET</button>
+    </div>
+    <div class="quiz-wrap" id="mcqWrap"></div>
+  </div>
+  <!-- MATCHING -->
+  <div class="tab-panel" id="tab-matching">
+    <h2 class="section-title">Matching Activity</h2>
+    <p class="section-sub">Click a term on the left, then click the matching definition on the right.</p>
+    <div style="margin-bottom:16px">
+      <div class="score-bar">
+        <div><div class="score-num" id="matchScore">0</div><div style="font-size:12px;color:var(--mid)">matched</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="matchTotal">0</strong></div>
+        <button class="reset-btn" onclick="resetMatch()">RESET</button>
+      </div>
+    </div>
+    <div class="match-grid">
+      <div><div class="match-label">TERMS</div><div class="match-col" id="matchLeft"></div></div>
+      <div><div class="match-label">DEFINITIONS</div><div class="match-col" id="matchRight"></div></div>
+    </div>
+  </div>
+  <!-- FIB -->
+  <div class="tab-panel" id="tab-fib">
+    <h2 class="section-title">Fill in the Blanks</h2>
+    <p class="section-sub">Click each dropdown and choose the correct word. Wrong answers reset — try again!</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="fibScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="fibTotal">0</strong> blanks</div>
+      <button class="reset-btn" onclick="resetFIB()">RESET</button>
+    </div>
+    <div class="fib-wrap" id="fibWrap"></div>
+  </div>
+  <!-- MISCONCEPTIONS -->
+  <div class="tab-panel" id="tab-misconceptions">
+    <h2 class="section-title">Common Misconceptions</h2>
+    <p class="section-sub">What students often think — and what examiners actually want.</p>
+    <div class="misc-list" id="miscList"></div>
+  </div>
+  <!-- EXAM TIPS -->
+  <div class="tab-panel" id="tab-examtips">
+    <h2 class="section-title">Exam Questions &amp; Tips</h2>
+    <p class="section-sub">Most repeated question types and mark-scheme structures from real OCR papers.</p>
+    <div class="tips-grid" id="tipsGrid"></div>
+  </div>
+  <!-- FLASHCARDS -->
+  <div class="tab-panel" id="tab-flashcards">
+    <h2 class="section-title">Flashcards</h2>
+    <p class="section-sub">Test yourself! Flip the card and rate your knowledge. Review your weak areas at the end.</p>
+    <div class="fc-container">
+      <div class="score-bar" id="fcScoreBar" style="display:none;margin-bottom:20px">
+        <div><div class="score-num" id="fcKnown" style="color:#2d7a4f">0</div><div style="font-size:12px;color:var(--mid)">known</div></div>
+        <div><div class="score-num" id="fcUnknown" style="color:#c84b31">0</div><div style="font-size:12px;color:var(--mid)">learning</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="fcTotalTrack">0</strong></div>
+        <button class="reset-btn" onclick="resetFlashcards()">RESET</button>
+      </div>
+      <div id="fcActiveArea">
+        <div class="fc-progress" id="fcProgress">Card 1 of 0</div>
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="fc-inner">
+            <div class="fc-front"><div class="fc-label">KEY TERM</div><div class="fc-term" id="fcTerm"></div></div>
+            <div class="fc-back"><div class="fc-def" id="fcDef"></div></div>
+          </div>
+        </div>
+        <p class="fc-hint">👆 Click card to flip</p>
+        <div class="fc-nav" id="fcNavDefault">
+          <button class="fc-btn outline" onclick="prevCard()">← Prev</button>
+          <button class="fc-btn outline" onclick="flipCard()">Flip</button>
+          <button class="fc-btn" onclick="nextCard()">Next →</button>
+        </div>
+        <div class="fc-nav" id="fcNavAssess" style="display:none;gap:15px">
+          <button class="fc-btn outline" style="border-color:#c84b31;color:#c84b31;flex:1" onclick="markCard(false)">❌ Still Learning</button>
+          <button class="fc-btn" style="background:#2d7a4f;border-color:#2d7a4f;flex:1" onclick="markCard(true)">✅ Got It</button>
+        </div>
+      </div>
+      <div id="fcSummaryArea" style="display:none;text-align:center;padding:40px 20px">
+        <h3>Session Complete! 🎉</h3>
+        <p style="margin:15px 0">You knew <strong id="fcSummaryKnown">0</strong> out of <strong id="fcSummaryTotal">0</strong> cards.</p>
+        <div style="margin-top:25px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap">
+          <button class="fc-btn" id="btnReviewWrong" onclick="reviewWrong()" style="background:#c84b31;border-color:#c84b31">Review Incorrect</button>
+          <button class="fc-btn outline" onclick="resetFlashcards()">Practice All Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- TRUE / FALSE -->
+  <div class="tab-panel" id="tab-truefalse">
+    <h2 class="section-title">True or False?</h2>
+    <p class="section-sub">Test your knowledge with these statements.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="tfScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="tfTotal">0</strong> answered</div>
+      <button class="reset-btn" onclick="resetTF()">RESET</button>
+    </div>
+    <div class="tf-wrap" id="tfWrap"></div>
+  </div>
+  <!-- EXAM PRACTICE -->
+  <div class="tab-panel" id="tab-exampractice">
+    <h2 class="section-title">Exam Practice Questions</h2>
+    <p class="section-sub">Full exam questions with case studies. Use <strong>Hint</strong>, <strong>Sentence Starter</strong> and <strong>Submit &amp; See Mark Scheme</strong> for each question.</p>
+    <div class="ep-list" id="epList"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════
+     DATA ARRAYS
+     ══════════════════════════════════════ -->
+
+<script>
+
+  /* ══════════════════════════════════════════════
+     PAGE METADATA — Issues Evaluation
+  ══════════════════════════════════════════════ */
+
+  const pageMeta = {
+    badge: "AQA GCSE Geography · Paper 3 — Issues Evaluation",
+    title: "Issues Evaluation · Cayman Islands Port",
+    subtitle: "Interactive revision guide · All key content + full exam practice"
+  };
+
+  /* ── Apply metadata on load ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    const badgeEl = document.querySelector('.badge');
+    const h1El = document.querySelector('header h1');
+    const subEl = document.querySelector('header p');
+    const titleEl = document.querySelector('title');
+
+    if (badgeEl) badgeEl.innerHTML = pageMeta.badge;
+    if (h1El) h1El.textContent = pageMeta.title;
+    if (subEl) subEl.textContent = pageMeta.subtitle;
+    if (titleEl) titleEl.textContent = pageMeta.title.replace(/&amp;/g, '&');
+  });
+
+  /* ══════════════════════════════════════════════
+     ARRAY 1: topics (Key Learning Cards)
+  ══════════════════════════════════════════════ */
+
+  const topics = [
+    {
+      title: "What is Issue Evaluation?",
+      tag: "Core Concept",
+      content: `<p>Issue evaluation is found in <strong>Part A of Paper 3</strong> and is worth <strong>37 marks (30% of Paper 3)</strong>. It tests your ability to analyse and interpret information, think critically, and make evidence-based decisions.</p>
+<ul>
+  <li><strong>Pre-release booklet:</strong> Sent to schools 12 weeks before the exam containing maps, graphs, photographs, statistics, and written extracts.</li>
+  <li><strong>In the exam:</strong> A fresh copy is provided — you cannot take in your annotated version, so you must memorise your notes.</li>
+  <li><strong>Synoptic:</strong> The issue covers multiple topics from the specification at once.</li>
+  <li><strong>Skills tested:</strong> Geographical skills, interpretation, analysis, and decision-making (evaluation).</li>
+</ul>
+<div class="case-study-box">
+  <h4>2023 Issue: Cayman Islands Port</h4>
+  <p>The 2023 pre-release focused on the proposed new cruise port in George Town, Grand Cayman. It covered tourism, economic development, ecosystems/coral reefs, and the environmental impacts of development.</p>
+</div>`
+    },
+    {
+      title: "The Cayman Islands — A Profile",
+      tag: "Case Study",
+      content: `<p>The Cayman Islands is a <strong>British Overseas Territory</strong> located in the <strong>Western Caribbean</strong>, comprising three islands: Grand Cayman, Cayman Brac, and Little Cayman. The capital is <strong>George Town</strong>.</p>
+<ul>
+  <li><strong>Population:</strong> 71,432 (2022) — over 130 nationalities, with 34,171 foreign workers on visas.</li>
+  <li><strong>Economy:</strong> GDP per capita of US$83,568 (higher than the UK at US$46,510). Over 92% of GDP comes from the service sector.</li>
+  <li><strong>Finance:</strong> 40 of the world's 50 largest banks have branches here — tax-free status attracts the wealthy.</li>
+  <li><strong>Status:</strong> Classed by the UN as a Small Island Developing State (SIDS), but is a High-Income Country (HIC).</li>
+  <li><strong>Food reliance:</strong> 90% of food and consumer goods are imported due to limited farming.</li>
+  <li><strong>Climate:</strong> Tropical marine — wet season May–October, dry season November–April, over 300 days of sunshine per year. Temperature range of only 4°C (25–29°C).</li>
+</ul>
+<div class="case-study-box">
+  <h4>Poverty in a Wealthy Place</h4>
+  <p>Despite high GDP per capita, 1.9% live in poverty and over 2% are food insecure. One third of the workforce earns less than US$2,800/month. GDP per capita is a mean average and can be misleading — it hides the inequality between the wealthy and the poorest residents.</p>
+</div>`
+    },
+    {
+      title: "Growth and Importance of Tourism",
+      tag: "Key Theory",
+      content: `<p>Tourism has grown into a <strong>major global industry</strong> over the last 50 years. An estimated 900 million people become international tourists each year (pre-pandemic). Travel and tourism is the <strong>largest employer globally</strong>, representing 7% of world exports.</p>
+<ul>
+  <li><strong>Reasons for growth:</strong> higher disposable incomes, cheaper/faster transport, internet booking, built attractions (theme parks, festivals).</li>
+  <li><strong>In 2019 (pre-Covid):</strong> Tourism = 13.6% of global GDP (US$9.6 trillion), 9.9% of all jobs (333 million).</li>
+  <li><strong>Covid-19 impact:</strong> 62 million jobs lost in 2020; recovery began in 2021.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">Direct Impacts</div>
+    <div class="pro-item">Jobs in hotels, restaurants, transport, lifeguards</div>
+    <div class="pro-item">Foreign exchange and government revenue</div>
+    <div class="pro-item">Infrastructure development (water, roads)</div>
+  </div>
+  <div>
+    <div class="col-head">Indirect Impacts (Multiplier Effect)</div>
+    <div class="pro-item">Primary sector: agriculture, mining for hotel supplies</div>
+    <div class="pro-item">Secondary sector: manufacturing goods (beds, towels, gifts)</div>
+    <div class="pro-item">Small business and informal sector growth</div>
+  </div>
+</div>
+<div class="case-study-box">
+  <h4>LICs/NEEs vs HICs</h4>
+  <p>LICs and NEEs rely far more heavily on tourism — Macau receives 29.3% of income from casino/hotel tourism. The Caribbean's tourist reliance averages around 16–35%. HICs like the UK (3.7%) and USA (2.6%) are far less dependent.</p>
+</div>`
+    },
+    {
+      title: "Cruise Tourism and the Caribbean",
+      tag: "Case Study",
+      content: `<p>The <strong>Caribbean</strong> is the world's most popular cruise destination with over a third of global market share. Cruise holidays have risen in popularity because all-inclusive packages reduce extra costs for travellers.</p>
+<ul>
+  <li><strong>Global scale:</strong> In 2019, 29.7 million cruise passengers generated 1.8 million jobs and paid US$50 billion in wages, contributing US$154 billion to the global economy.</li>
+  <li><strong>Caribbean arrivals:</strong> Over 15 million visitors annually, of which 11.3 million arrive by cruise ship.</li>
+  <li><strong>Source countries:</strong> USA (54%), Western Europe (26%), China (10%), Australia (6%), Others (4%).</li>
+  <li><strong>Cayman Islands:</strong> Cruise passengers make up 75% of tourist visitors. Tourism contributes 16% to GDP.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">Advantages of Cruise Tourism</div>
+    <div class="pro-item">For every US$1 spent on tourism, US$1.2 is generated by cruise visitors</div>
+    <div class="pro-item">Every hotel room creates at least one job</div>
+    <div class="pro-item">50 jobs per $100,000 invested</div>
+    <div class="pro-item">Multi-island stops spread economic benefits</div>
+  </div>
+  <div>
+    <div class="col-head">Disadvantages of Cruise Tourism</div>
+    <div class="con-item">Daily cruise spending is 55% less than long-stay visitors</div>
+    <div class="con-item">15–20% of passengers never disembark</div>
+    <div class="con-item">Over 70,000 tonnes of wastewater produced annually</div>
+    <div class="con-item">Tourists generate twice the waste of locals per day</div>
+  </div>
+</div>`
+    },
+    {
+      title: "The Proposed New Port in George Town",
+      tag: "Core Issue",
+      content: `<p>The existing port was built in <strong>1977</strong> with a capacity of 50,000 tonnes per year. Cargo is now over <strong>500,000 tonnes</strong> — a tenfold increase. The port is predicted to <strong>run out of space by 2033</strong>.</p>
+<ul>
+  <li><strong>Key problem:</strong> Cargo and cruise facilities are mixed together, causing safety hazards and inefficiency. Cargo can only operate 6pm–5am.</li>
+  <li><strong>Tender system:</strong> Cruise passengers must use small tender boats to get ashore, reducing visitor time on the island and creating congestion.</li>
+  <li><strong>Proposed solution (2019):</strong> A new cruise terminal financed by Verdant Isle Group (Carnival Corp and Royal Caribbean Cruises) at an estimated cost of <strong>$240 million</strong>.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">For the New Port</div>
+    <div class="pro-item">5,000+ jobs depend on cruise tourism</div>
+    <div class="pro-item">Larger ships can berth — 50% of cruise business lost without upgrade</div>
+    <div class="pro-item">Separates cargo and cruise operations</div>
+    <div class="pro-item">George Town Revitalisation — green spaces, cycling, housing</div>
+    <div class="pro-item">More passengers will disembark, increasing visitor spending</div>
+  </div>
+  <div>
+    <div class="col-head">Against the New Port</div>
+    <div class="con-item">15+ acres of coral reef destroyed by dredging to 10m depth</div>
+    <div class="con-item">Hawksbill Turtle habitat lost — critically endangered species</div>
+    <div class="con-item">Sediment from dredging clouds the water — kills remaining coral</div>
+    <div class="con-item">Loss of income for diving/snorkelling businesses</div>
+    <div class="con-item">Similar projects in Jamaica did not increase income</div>
+  </div>
+</div>
+<div class="case-study-box">
+  <h4>Outcome</h4>
+  <p>The Cayman Islands government <strong>abandoned the proposal</strong> following protests from the local population and environmental organisations. The Minister of Tourism stated: "My people have said that the environment is more important to our country, from a sustainable perspective, than cruise itself."</p>
+</div>`
+    },
+    {
+      title: "Analysing Geographical Sources",
+      tag: "Exam Skills",
+      content: `<p>In the issues evaluation exam you must interpret a range of data sources. Use these frameworks for each type:</p>
+<ul>
+  <li><strong>Maps:</strong> Read the title, key, scale, and unit of measurement. Identify patterns (e.g. north/south differences). Note any features that might be affected by development.</li>
+  <li><strong>Graphs:</strong> Identify the trend (increasing/decreasing/fluctuating), highest and lowest values with dates, and calculate percentage changes if asked. For compound graphs, read only the shaded area you need.</li>
+  <li><strong>Tables:</strong> Compare categories, identify anomalies, note units of measurement.</li>
+  <li><strong>Photographs:</strong> Identify physical vs human features and location. What does the image suggest about the issue?</li>
+  <li><strong>Text:</strong> Highlight key facts, figures and place names. Identify who is affected and how.</li>
+</ul>
+<div class="formula-box">
+  <strong>Useful Calculations:</strong><br>
+  Range = Highest value − Lowest value<br>
+  Mean = Sum of all values ÷ Number of values<br>
+  % increase = (Increase ÷ Original) × 100<br>
+  % of total = (Part ÷ Whole) × 100
+</div>`
+    },
+    {
+      title: "Evaluation and Decision-Making",
+      tag: "Exam Skills",
+      content: `<p>The 9-mark decision question is the most important part of the issues evaluation. You must make a clear decision about the geographical issue and justify it using evidence from the resource booklet and your own knowledge.</p>
+<ul>
+  <li><strong>No right or wrong answer</strong> — marks are awarded for the quality of your justification, not the decision itself.</li>
+  <li><strong>Use the BRAIN acronym:</strong> Broad range of analysis, Reached a decision, Alternatives rejected and justified, Identify the issues, No perfect solution, Supported with evidence.</li>
+</ul>
+<div class="formula-box">
+  <strong>Structure for the 9-mark answer:</strong><br>
+  1. Introduction — state your decision clearly<br>
+  2. Advantages of your chosen option (with data from the booklet)<br>
+  3. Acknowledge disadvantages and how they could be managed<br>
+  4. Briefly explain why the alternative is less suitable<br>
+  5. Conclusion — reinforce why your decision is most suitable/sustainable
+</div>
+<div class="case-study-box">
+  <h4>Example Stakeholders for Cayman Islands Port</h4>
+  <p><strong>For the port:</strong> Government, cruise companies (Carnival, Royal Caribbean), local businesses, hoteliers, George Town residents.<br>
+  <strong>Against the port:</strong> National Trust for the Cayman Islands, RSPB, diving/snorkelling operators, tender boat owners, environmentalists.</p>
+</div>`
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 2: mcqData (Multiple Choice Quiz)
+  ══════════════════════════════════════════════ */
+
+  const mcqData = [
+    {
+      q: "How many marks is the issues evaluation section of AQA Paper 3 worth?",
+      opts: ["25 marks", "30 marks", "37 marks", "45 marks"],
+      ans: 2,
+      explain: "Correct: C. The issues evaluation section is worth 37 marks, which represents 30% of Paper 3. A is too low, B is also incorrect, and D would be too high for this section."
+    },
+    {
+      q: "The Cayman Islands pre-release booklet was sent to schools how many weeks before the 2023 exam?",
+      opts: ["4 weeks", "8 weeks", "12 weeks", "16 weeks"],
+      ans: 2,
+      explain: "Correct: C. The resource booklet is sent to schools 12 weeks before the exam. This gives students time to become familiar with the sources. A and B are too short, and D is too long."
+    },
+    {
+      q: "Which city in the UK has the highest annual rainfall?",
+      opts: ["Bristol", "Glasgow", "Liverpool", "London"],
+      ans: 1,
+      explain: "Correct: B. Glasgow has annual rainfall of 2800mm+ (highest category). Bristol has 750–999mm, Liverpool also has 750–999mm, and London has 500–749mm — the driest."
+    },
+    {
+      q: "What percentage of the Cayman Islands' GDP comes from the service sector?",
+      opts: ["62%", "79%", "92%", "98%"],
+      ans: 2,
+      explain: "Correct: C. Over 92% of the Cayman Islands' GDP comes from the service sector. A (62%) is incorrect, B (79%) refers to the percentage of people employed in the service sector, and D is too high."
+    },
+    {
+      q: "What was the estimated cost of the proposed new port in George Town?",
+      opts: ["$100 million", "$180 million", "$240 million", "$350 million"],
+      ans: 2,
+      explain: "Correct: C. The proposed new port was to be financed by the Verdant Isle Group at an estimated cost of $240 million. A and B are too low, while D is too high."
+    },
+    {
+      q: "In 2018, which world region had the largest number of international tourist arrivals?",
+      opts: ["Americas", "Asia", "Africa", "Europe"],
+      ans: 3,
+      explain: "Correct: D. Europe had the largest number of international tourist arrivals in 2018. It has consistently been the leading region. Americas was second, Asia third, and Africa has the smallest share."
+    },
+    {
+      q: "What percentage of cruise passengers visiting the Cayman Islands come from the USA?",
+      opts: ["26%", "38%", "46%", "54%"],
+      ans: 3,
+      explain: "Correct: D. 54% of cruise arrivals to the Cayman Islands come from the USA. Western Europe accounts for 26%, China for 10%, and Australia for 6%."
+    },
+    {
+      q: "Approximately how many acres of coral reef would be destroyed by the proposed new port development?",
+      opts: ["5 acres", "10 acres", "15 acres", "22 acres"],
+      ans: 2,
+      explain: "Correct: C. Over 15 acres of coral reef would be destroyed by the port development. The dredging would go to a depth of 10m. In addition, 22 acres of seabed would need to be dredged for the channel."
+    },
+    {
+      q: "By what year is the existing port at George Town predicted to run out of space?",
+      opts: ["2025", "2029", "2033", "2040"],
+      ans: 2,
+      explain: "Correct: C. Estimates suggest the port will run out of space by 2033. The port was built in 1977 with a capacity of 50,000 tonnes, but cargo arrivals are now over 500,000 tonnes — a tenfold increase."
+    },
+    {
+      q: "Daily cruise passenger spending is how much less than long-stay visitors?",
+      opts: ["25% less", "40% less", "55% less", "70% less"],
+      ans: 2,
+      explain: "Correct: C. Daily cruise spending is 55% less than long-stay visitors. This is largely because many cruise passengers have all-inclusive packages on board their ship and some never even disembark."
+    },
+    {
+      q: "Calculate: the UK increased its renewable energy capacity from 10 GW in 2010 to 44 GW in 2018. What was the increase?",
+      opts: ["26 GW", "30 GW", "34 GW", "38 GW"],
+      ans: 2,
+      explain: "Correct: C. 44 − 10 = 34 GW increase. A (26 GW), B (30 GW), and D (38 GW) are all incorrect calculations. Always subtract the earlier value from the later value to find the increase."
+    },
+    {
+      q: "Which of the following is NOT an advantage of the proposed new Cayman Islands port?",
+      opts: [
+        "Separation of cargo and cruise operations",
+        "More passengers likely to disembark and spend money",
+        "Destruction of the coral reef ecosystem",
+        "Reduction in harbour congestion from tender boats"
+      ],
+      ans: 2,
+      explain: "Correct: C. Destruction of the coral reef is a DISADVANTAGE (environmental cost), not an advantage. Separation of cargo and cruise (A), more disembarking passengers (B), and reduced congestion (D) are all cited as benefits of the new port."
+    },
+    {
+      q: "What percentage of the Cayman Islands' food and consumer goods are imported?",
+      opts: ["60%", "75%", "90%", "100%"],
+      ans: 2,
+      explain: "Correct: C. 90% of food and consumer goods are imported to the Cayman Islands. This is because there is very little farming or industry on the islands. Without cargo trade, the islands would experience serious shortages."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 3: matchData (Keyword Matching)
+  ══════════════════════════════════════════════ */
+
+  const matchData = [
+    { term: "Issue evaluation", def: "A section of AQA Paper 3 worth 37 marks that tests analysis, interpretation and decision-making about a geographical issue using pre-release materials." },
+    { term: "Synoptic", def: "Covering more than one topic from the specification at once — the issues evaluation links multiple geographical themes together." },
+    { term: "Tender", def: "A small boat used to transport cruise ship passengers from the anchored ship to shore, as the Cayman Islands had no direct berthing facilities." },
+    { term: "Multiplier effect", def: "When money generated by tourism creates additional economic activity in other sectors, amplifying the total economic benefit." },
+    { term: "Coral reef", def: "A fragile underwater ecosystem threatened by the dredging required for the new Cayman Islands port — over 15 acres would have been destroyed." },
+    { term: "SIDS", def: "Small Island Developing State — a UN classification for the Cayman Islands that recognises unique social, economic and environmental challenges faced by small island nations." },
+    { term: "GDP per capita", def: "Gross Domestic Product divided by the total population — a measure of average wealth, but can be misleading as it is a mean that hides inequality." },
+    { term: "Dredging", def: "The process of deepening a waterway or port by removing material from the seabed — proposed for George Town to a depth of 10m, which would destroy coral." },
+    { term: "Hawksbill Turtle", def: "A critically endangered species whose habitat would be destroyed by the proposed port dredging in the Cayman Islands." },
+    { term: "Verdant Isle Group", def: "The consortium that proposed financing the new Cayman Islands port at a cost of $240 million, including cruise companies Carnival Corp and Royal Caribbean." },
+    { term: "George Town Revitalisation Initiative", def: "The wider urban improvement project linked to the new port proposal, including green spaces, cycling access, improved lighting, and conservation of historical sites." },
+    { term: "Stakeholder", def: "Any individual or group with an interest in a geographical issue — in the Cayman port case, these include the government, cruise companies, environmentalists, and local businesses." },
+    { term: "Long-stay visitor", def: "A tourist who stays overnight or longer in a destination, spending significantly more money than a cruise day-tripper — they generate US$1.6 per US$1 of government spending." },
+    { term: "Sediment", def: "Fine particles disturbed by dredging that cloud the water and block sunlight to coral polyps, causing bleaching and death of the remaining reef." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 4: fibData (Fill in the Blanks)
+     ARRAY 5: fibWords (Word Bank)
+  ══════════════════════════════════════════════ */
+
+  const fibData = [
+    {
+      display: "Issue evaluation is worth _____ marks and is found in Part _____ of Paper 3.",
+      blanks: { B1: "37", B2: "A" }
+    },
+    {
+      display: "The pre-release booklet is sent to schools _____ weeks before the exam and covers a geographical _____.",
+      blanks: { B1: "twelve", B2: "issue" }
+    },
+    {
+      display: "The Cayman Islands is a British _____ Territory located in the Western _____.",
+      blanks: { B1: "Overseas", B2: "Caribbean" }
+    },
+    {
+      display: "The GDP per capita of the Cayman Islands is US$_____, compared to the UK's US$46,510.",
+      blanks: { B1: "83,568" }
+    },
+    {
+      display: "The proposed new port would be financed by the _____ Isle Group at a cost of $_____ million.",
+      blanks: { B1: "Verdant", B2: "240" }
+    },
+    {
+      display: "Currently, _____ of the Cayman Islands' goods and food are imported, as there is very little _____ on the islands.",
+      blanks: { B1: "90%", B2: "farming" }
+    },
+    {
+      display: "The existing port at George Town was built in _____ and had a capacity of _____ tonnes per year.",
+      blanks: { B1: "1977", B2: "50,000" }
+    },
+    {
+      display: "The proposed dredging would be to a depth of _____ metres, destroying over _____ acres of coral reef.",
+      blanks: { B1: "10", B2: "15" }
+    },
+    {
+      display: "Cruise passengers make up _____% of all tourist visitors to the Cayman Islands, with the majority arriving between _____ and March.",
+      blanks: { B1: "75", B2: "November" }
+    },
+    {
+      display: "Daily cruise spending is _____% less than long-stay visitors, and between _____% and 20% of passengers never disembark.",
+      blanks: { B1: "55", B2: "15" }
+    },
+    {
+      display: "The Caribbean has the highest number of cruise tourist arrivals in the world, contributing up to half of _____ in most Caribbean countries.",
+      blanks: { B1: "GDP" }
+    },
+    {
+      display: "In 2019 (pre-Covid), global tourism accounted for _____% of global GDP and _____% of all jobs worldwide.",
+      blanks: { B1: "13.6", B2: "9.9" }
+    }
+  ];
+
+  const fibWords = [
+    "37", "A", "twelve", "issue", "Overseas", "Caribbean", "83,568", "Verdant", "240",
+    "90%", "farming", "1977", "50,000", "10", "15", "75", "November", "55", "15", "GDP", "13.6", "9.9",
+    // Distractors
+    "25", "B", "eight", "topic", "Crown", "Atlantic", "46,510", "Emerald", "180",
+    "70%", "manufacturing", "1988", "100,000", "12", "20", "60", "December", "45", "10",
+    "GNI", "11.2", "7.3", "Pacific", "sixteen"
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 6: tfData (True / False)
+  ══════════════════════════════════════════════ */
+
+  const tfData = [
+    {
+      statement: "The AQA issues evaluation pre-release booklet is sent to schools 8 weeks before the exam.",
+      answer: false,
+      explanation: "FALSE. The booklet is sent to schools 12 weeks before the exam, giving students sufficient time to study and annotate the sources. You cannot take your annotated copy into the exam — a new copy is provided."
+    },
+    {
+      statement: "The Cayman Islands is classified by the UN as a Small Island Developing State (SIDS).",
+      answer: true,
+      explanation: "TRUE. The Cayman Islands is classed as a SIDS by the United Nations, despite being a High-Income Country (HIC). This means it faces unique challenges including fragile ecosystems, vulnerability to tropical cyclones, and high import costs."
+    },
+    {
+      statement: "All cruise passengers who arrive at a destination always disembark and spend money in the local economy.",
+      answer: false,
+      explanation: "FALSE. Between 15% and 20% of cruise passengers choose to stay onboard and never set foot on the island. However, they are still counted in visitor arrival statistics, which can make tourist numbers appear higher than the economic reality."
+    },
+    {
+      statement: "The existing port at George Town was originally built with a capacity of 50,000 tonnes per year.",
+      answer: true,
+      explanation: "TRUE. The port was built in 1977 with a capacity of 50,000 tonnes per year. However, cargo arrivals are now over 500,000 tonnes — a tenfold increase — meaning it is severely overstretched and predicted to run out of space by 2033."
+    },
+    {
+      statement: "Long-stay tourists generate more money per US$1 of government tourism spending than cruise visitors.",
+      answer: true,
+      explanation: "TRUE. For every US$1 spent by the country on tourism, US$1.6 is generated by long-stay tourists compared to US$1.2 by cruise visitors. Long-stay visitors also tend to use hotels, local restaurants, and activity providers more extensively."
+    },
+    {
+      statement: "The Cayman Islands' government went ahead with the proposed new cruise port development in 2019.",
+      answer: false,
+      explanation: "FALSE. The Cayman Islands' government abandoned the proposals following protests from the local population and environmental organisations. The Minister of Tourism stated that the environment was more important than cruise tourism from a sustainable perspective."
+    },
+    {
+      statement: "Daily cruise spending in the Caribbean is 55% less than spending by long-stay visitors.",
+      answer: true,
+      explanation: "TRUE. Daily cruise spending is 55% less than long-stay visitor spending. This is largely because many cruise passengers have all-inclusive packages covering food, drink, and entertainment on the ship, so they spend less on the island."
+    },
+    {
+      statement: "The proposed new port would have required dredging to a depth of 20 metres to allow larger cruise ships to berth.",
+      answer: false,
+      explanation: "FALSE. The dredging would have been to a depth of 10 metres (not 20 metres). This would have destroyed over 15 acres of coral reef and disturbed sediment that would cloud the water, damaging the remaining reef by blocking sunlight."
+    },
+    {
+      statement: "The Caribbean is the most popular cruise destination in the world, with over a third of global market share.",
+      answer: true,
+      explanation: "TRUE. The Caribbean consistently has the highest number of cruise tourist arrivals globally, with over a third of the world's cruise market share. Over 15 million people visit the Caribbean each year, of which 11.3 million arrive by cruise ship."
+    },
+    {
+      statement: "GDP per capita is a reliable indicator of individual living standards because it reflects how much every person in a country actually earns.",
+      answer: false,
+      explanation: "FALSE. GDP per capita is a mean average and can be very misleading. In the Cayman Islands, a high GDP per capita of US$83,568 masks the fact that one third of the workforce earns less than US$2,800/month and some of the poorest areas in the Caribbean are found there."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 7: miscData (Common Misconceptions)
+  ══════════════════════════════════════════════ */
+
+  const miscData = [
+    {
+      wrong: "More cruise ship tourists automatically means more money for the local economy.",
+      correct: "This is a common oversimplification. Cruise passengers spend 55% less per day than long-stay visitors, and between 15–20% never even disembark. Increasing cruise numbers without also increasing the proportion who come ashore may not significantly boost local income. Examiners want to see this nuance explained."
+    },
+    {
+      wrong: "GDP per capita tells us exactly how wealthy every person in a country is.",
+      correct: "GDP per capita is a mean average and can be very misleading. In the Cayman Islands, GDP per capita is US$83,568, yet one third of the workforce earns less than US$2,800/month and some of the poorest areas in the Caribbean are found there. Always note that the average hides inequality."
+    },
+    {
+      wrong: "Abandoning the new port was clearly the right decision because the environment was protected.",
+      correct: "In an evaluation question, there is no simple right or wrong answer. While the environmental benefits of abandoning the port are real (protecting 15+ acres of coral, safeguarding the Hawksbill Turtle), there were also significant economic costs: 5,000+ jobs depend on cruise tourism and 50% of cruise business was at risk. Examiners reward balanced judgements, not one-sided conclusions."
+    },
+    {
+      wrong: "Students often write 'the port will harm the environment' without any specific detail.",
+      correct: "This is too vague to gain marks. You must be specific: the dredging would go to 10m depth, destroying over 15 acres of coral reef. Sediment would cloud the water, blocking photosynthesis in the algae that support coral polyps. The critically endangered Hawksbill Turtle would lose its habitat. Always give named examples and data from the booklet."
+    },
+    {
+      wrong: "You need to agree with the question statement to get full marks in the 9-mark evaluation.",
+      correct: "This is completely false. Whether you agree or disagree does not affect your marks — only the quality of your justification matters. You must support your decision with evidence from the resource booklet and your own geographical knowledge, acknowledge the other side of the argument, and reach a clear, reasoned conclusion."
+    },
+    {
+      wrong: "The Cayman Islands is a poor developing country that needs tourism for survival.",
+      correct: "The Cayman Islands is actually a High-Income Country (HIC) with a GDP per capita of US$83,568 — significantly higher than the UK's US$46,510. While it faces challenges as a SIDS (Small Island Developing State), its economy is dominated by high finance (40 of the world's 50 largest banks have branches there). This context is important when evaluating the port development."
+    },
+    {
+      wrong: "Writing a conclusion is optional in the 9-mark decision question.",
+      correct: "A conclusion is essential for reaching Level 3 (the highest mark band). Your conclusion should state clearly why your chosen option is the most suitable, sustainable, or beneficial — without introducing new information. Do not say 'I think' or 'they should'; instead make a confident, definitive statement supported by your earlier reasoning."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 8: examTips
+  ══════════════════════════════════════════════ */
+
+  const examTips = [
+    {
+      type: "Describe — 1–2 marks",
+      title: "Use Data, Name Patterns",
+      content: `<p>Describe questions ask you to say <strong>what you see</strong> in a graph, map, or table — not why. You must support every point with data.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Trend:</strong> State whether values are increasing, decreasing, or fluctuating.</li>
+  <li><strong>Data point:</strong> Quote a specific figure with a date or label.</li>
+  <li><strong>Exception:</strong> Note any anomalies or changes in rate if relevant.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The number of cruise passengers went up."</p>
+<p><strong>✅ Strong Answer:</strong> "Cruise passengers increased steadily from 18 million in 2009 to 29 million in 2018, a growth of 61.1%."</p>
+<p><strong>Sentence Starter:</strong> "Between [date] and [date], [value] increased/decreased from [X] to [Y]..."</p>`,
+      pills: ["K"]
+    },
+    {
+      type: "Explain / Suggest — 2–4 marks",
+      title: "Cause → Effect → So What?",
+      content: `<p>Explain and suggest questions require you to show <strong>why</strong> something happens, not just what. Each mark requires a developed point, not just a statement.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Point:</strong> Make a specific geographical point.</li>
+  <li><strong>Reason/Link:</strong> Explain the cause or mechanism using geographical knowledge.</li>
+  <li><strong>Consequence:</strong> State the impact or outcome — "this means that..."</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The port is too small for cruise ships."</p>
+<p><strong>✅ Strong Answer:</strong> "The port was built in 1977 with a capacity of only 50,000 tonnes [point], but cargo has grown tenfold to over 500,000 tonnes [reason]. This means cargo operations can only run from 6pm–5am [consequence], creating safety hazards and reducing efficiency."</p>
+<p><strong>Sentence Starter:</strong> "This is because... which means that... As a result..."</p>`,
+      pills: ["K", "app"]
+    },
+    {
+      type: "Discuss / To what extent — 6 marks",
+      title: "Balance: Both Sides + Evidence",
+      content: `<p>These questions require a <strong>balanced discussion</strong> using evidence from the resource booklet (Application) and your own knowledge (Selection). Each is worth 3 marks.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>State your stance:</strong> Agree or partly agree, clearly.</li>
+  <li><strong>Point + Evidence [Ap]:</strong> Use specific data from the figures.</li>
+  <li><strong>Link to own knowledge [S]:</strong> Use wider geographical understanding.</li>
+  <li><strong>Counter-argument:</strong> Acknowledge the other side — "However..."</li>
+  <li><strong>Conclusion:</strong> Return to the statement with a reasoned judgement.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "Some activities are more damaging than others because logging destroys the forest."</p>
+<p><strong>✅ Strong Answer:</strong> "I strongly agree because not all activities affect ecosystems equally. Commercial logging clears large areas [Ap], whereas shifting subsistence farming is small-scale and temporary, allowing regrowth [S]. Mining using mercury causes irreversible river pollution [Ap], unlike ecotourism which can benefit the environment [S]."</p>
+<p><strong>Sentence Starter:</strong> "I agree/disagree because... Evidence from Figure X shows... However, it is also important to consider..."</p>`,
+      pills: ["U", "app", "an"]
+    },
+    {
+      type: "Decision-Making — 9 marks (+3 SPaG)",
+      title: "BRAIN: Make a Clear, Justified Decision",
+      content: `<p>This is the highest-value question. You must make a clear decision and justify it using evidence from the booklet AND your own knowledge. Use the BRAIN acronym to check your answer.</p>
+<p><strong>BRAIN Check:</strong></p>
+<ul>
+  <li><strong>B</strong>road range of analysis from the booklet</li>
+  <li><strong>R</strong>eached a clear decision</li>
+  <li><strong>A</strong>lternatives are rejected and justified</li>
+  <li><strong>I</strong>dentify the key issues and stakeholders</li>
+  <li><strong>N</strong>o perfect solution acknowledged</li>
+  <li><strong>S</strong>upported with evidence (data, place names, figures)</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "I think the port should be built because it will create jobs and help the economy."</p>
+<p><strong>✅ Strong Answer:</strong> "The proposed port should not go ahead. Destroying over 15 acres of coral reef would threaten the Hawksbill Turtle (critically endangered) and damage the diving industry that long-stay visitors rely on. Long-stay visitors generate US$1.6 per dollar invested — more than cruise passengers. However, the economic risks are real: 5,000+ jobs depend on cruise tourism. These could be protected through alternative measures such as improving tender services and upgrading cargo facilities separately."</p>
+<p><strong>Sentence Starter:</strong> "I believe [decision] because... Evidence from Figure X shows... While it is true that [counterargument]... Overall, [decision] is the most sustainable option because..."</p>`,
+      pills: ["U", "app", "an", "eval"]
+    },
+    {
+      type: "Calculation — 1–3 marks",
+      title: "Show All Working for Full Marks",
+      content: `<p>Calculation questions reward method as well as the correct answer. Always show every step, even if the calculation seems simple.</p>
+<p><strong>Key calculations you must know:</strong></p>
+<ul>
+  <li><strong>Range:</strong> Highest value − Lowest value (include units)</li>
+  <li><strong>Mean:</strong> Sum of all values ÷ Number of values</li>
+  <li><strong>Percentage change:</strong> (Change ÷ Original) × 100</li>
+  <li><strong>Percentage of total:</strong> (Part ÷ Whole) × 100</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "34 GW" (no working shown)</p>
+<p><strong>✅ Strong Answer:</strong> "44 GW (2018) − 10 GW (2010) = 34 GW increase [working shown]. Answer: 34 GW."</p>
+<p><strong>Common error:</strong> Forgetting to include units (GW, million, %) — always write the unit with your answer.</p>`,
+      pills: ["K", "app"]
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 9: flashcards
+  ══════════════════════════════════════════════ */
+
+  const flashcards = [
+    { term: "What are the three topics covered in the 2023 AQA issues evaluation?", def: "Tourism, Economic Development / Quality of Life, Development / Closing the Gap, Ecosystems / Coral Reefs, and Environmental Impacts of Economic Development (synoptic — linking multiple topics)." },
+    { term: "Issue evaluation", def: "A synoptic section of AQA Paper 3 worth 37 marks (30%). It tests analysis, interpretation and decision-making using a resource booklet sent 12 weeks before the exam." },
+    { term: "SIDS", def: "Small Island Developing State — a UN classification for small island nations like the Cayman Islands that face unique social, economic and environmental challenges including fragile ecosystems and vulnerability to cyclones." },
+    { term: "Tender", def: "A small boat used to ferry cruise passengers from a ship anchored offshore to the shore, when no direct berthing is available. Tenders cause harbour congestion and reduce time spent ashore." },
+    { term: "George Town port — key facts", def: "Built 1977, capacity 50,000 tonnes/year. Cargo now over 500,000 tonnes (tenfold increase). Predicted to run out of space by 2033. Cargo operations only 6pm–5am due to cruise passenger safety." },
+    { term: "Proposed new port — key features", def: "Financed by Verdant Isle Group (Carnival Corp and Royal Caribbean) at $240 million. Two piers for four cruise liners. Dredged to 10m depth. Separate cargo area. Part of the George Town Revitalisation Initiative." },
+    { term: "Why long-stay tourists are more valuable than cruise tourists", def: "Long-stay visitors generate US$1.6 per US$1 of government spending (vs US$1.2 for cruise). They stay longer, use hotels, local restaurants, and activities. Cruise passengers spend 55% less daily and 15–20% never disembark." },
+    { term: "Environmental impacts of the proposed dredging", def: "Over 15 acres of coral reef destroyed; 22 acres of seabed dredged. Sediment clouds the water blocking sunlight for coral polyps. Hawksbill Turtle habitat lost (critically endangered). Diving/snorkelling businesses lose trade." },
+    { term: "Cayman Islands economy — key statistics", def: "GDP per capita: US$83,568. Over 92% of GDP from the service sector. 79% employed in services. Finance and tourism are the two mainstays. 40 of the world's 50 largest banks have branches here." },
+    { term: "BRAIN acronym for decision-making", def: "Broad range of analysis; Reached a decision; Alternatives rejected and justified; Identified the issues; No perfect solution acknowledged; Supported with evidence from the booklet and own knowledge." },
+    { term: "Multiplier effect", def: "When tourism money generates additional economic activity across other sectors. Primary (agriculture for hotels), secondary (manufacturing goods), informal sector support. One hotel room creates at least one job." },
+    { term: "Arguments FOR the new Cayman Islands port", def: "5,000+ jobs depend on cruise tourism; 50% of cruise business at risk without upgrade; more passengers will disembark; cargo and cruise operations separated; George Town regeneration; congestion reduced." },
+    { term: "Arguments AGAINST the new Cayman Islands port", def: "15+ acres of coral reef destroyed; Hawksbill Turtle habitat lost; sediment clouds water; diving/snorkelling businesses lose trade; cruise passengers spend 55% less than long-stay visitors; similar projects in Jamaica did not increase income." },
+    { term: "When to use 'Application' [Ap] in a 6-mark answer", def: "Application means referring to specific data, figures, place names, or information directly from the resource booklet figures (e.g. 'Figure 1 shows that water demand will rise from 4,900 to 5,600 million litres/day by 2030')." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 10: examQuestions
+  ══════════════════════════════════════════════ */
+
+  const examQuestions = [
+    {
+      num: "Q1",
+      marks: 1,
+      type: "mcq",
+      caseStudy: "",
+      question: "Which of the following is a disadvantage of cruise tourism for local island economies? [1 mark]",
+      options: [
+        "Cruise tourism generates jobs for local people",
+        "Daily cruise spending is 55% less than long-stay visitor spending",
+        "Cruise ships bring foreign exchange to the island",
+        "Multi-island cruise routes spread economic benefits across the region"
+      ],
+      answer: 1,
+      hint: "Think about how much money cruise passengers actually spend on the island compared to tourists who stay overnight.",
+      starter: "The correct answer is...",
+      markScheme: `<div class="marks-section">
+<h5>Answer: B — 1 mark</h5>
+<p><strong>B: Daily cruise spending is 55% less than long-stay visitor spending.</strong></p>
+<ul>
+  <li><strong>Why A is wrong:</strong> Job creation is an advantage of cruise tourism, not a disadvantage.</li>
+  <li><strong>Why C is wrong:</strong> Foreign exchange generation is also an advantage for local economies.</li>
+  <li><strong>Why D is wrong:</strong> Spreading economic benefits across multiple islands is a positive, indirect advantage of multi-island cruise routes.</li>
+</ul>
+</div>`,
+      modelAnswer: ""
+    },
+    {
+      num: "Q2",
+      marks: 2,
+      type: "written",
+      caseStudy: "",
+      question: "Give two effects of water stress. [2 marks]",
+      hint: "Think about what happens to households, businesses, and farmers when water becomes scarce.",
+      starter: "One effect of water stress is... A second effect of water stress is...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks</h5>
+<ul>
+  <li><strong>1 mark</strong> for each clearly stated effect of water stress (up to 2 marks).</li>
+</ul>
+<p><strong>Acceptable answers include:</strong></p>
+<ul>
+  <li>Hosepipe bans restrict outdoor water use</li>
+  <li>Rationing of water may be introduced</li>
+  <li>Water table drops, affecting aquifers</li>
+  <li>Increased water prices</li>
+  <li>Problems for agriculture/crop failure/food shortages</li>
+  <li>Industrial production affected — loss of output and jobs</li>
+  <li>Effects on vegetation in gardens/parks</li>
+  <li>Impact on recreational water activities (sailing, swimming)</li>
+</ul>
+<p><strong>Do NOT award:</strong> Vague answers such as "there would be less water" without a developed consequence.</p>
+<p><strong>Examiner's Comment:</strong> Most students can give one effect but often repeat a similar idea for the second mark. Take care to give two genuinely different effects — for example, an environmental effect and an economic effect.</p>
+</div>`,
+      modelAnswer: "One effect of water stress is that hosepipe bans would be introduced, making it difficult for households to water gardens or wash cars. A second effect is that farming would be seriously impacted, as farmers would be unable to irrigate crops, leading to reduced harvests and rising food prices."
+    },
+    {
+      num: "Q3",
+      marks: 2,
+      type: "written",
+      caseStudy: `The Cayman Islands has a population of 71,432 (2022). The GDP per capita is US$83,568, significantly higher than the UK's US$46,510. However, one third of the workforce earns less than US$2,800 per month, and over 2% of the population are food insecure. Some of the poorest areas in the Caribbean are found in the Cayman Islands.`,
+      question: "Study the information about the Cayman Islands above. Explain why GDP per capita may give a misleading impression of development in the Cayman Islands. [2 marks]",
+      hint: "GDP per capita is a mean average — think about what this means when incomes are very unequal.",
+      starter: "GDP per capita is misleading because it is an average, which means...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks</h5>
+<ul>
+  <li><strong>1 mark:</strong> Understanding that GDP per capita is a mean average (or equivalent).</li>
+  <li><strong>1 mark:</strong> Application — explaining why this masks the true picture in the Cayman Islands (reference to inequality, the wealthy few pulling up the average, or the reality for low-income residents).</li>
+</ul>
+<p><strong>Acceptable answers include:</strong></p>
+<ul>
+  <li>GDP per capita is a mean and can be distorted by a small number of very wealthy individuals</li>
+  <li>One third of the workforce earns less than US$2,800/month despite the high average</li>
+  <li>Some of the poorest areas in the Caribbean are in the Cayman Islands, suggesting the average does not reflect most people's lived experience</li>
+</ul>
+<p><strong>Do NOT award:</strong> Simply stating "the GDP is high" or "there is poverty" without linking these two ideas.</p>
+<p><strong>Examiner's Comment:</strong> Students often just state that there is inequality without explaining the mechanism. The key point is that the mean average is pulled upward by the very wealthy (including the financial sector), hiding the reality for lower-income Caymanians.</p>
+</div>`,
+      modelAnswer: "GDP per capita is a mean average, which means it is calculated by dividing total national income by the total population. In the Cayman Islands, the very wealthy financial sector and high earners pull this average upward significantly. This masks the reality that one third of the workforce earns less than US$2,800 per month and over 2% are food insecure — meaning the high average does not reflect the living standards of many ordinary residents."
+    },
+    {
+      num: "Q4",
+      marks: 4,
+      type: "written",
+      caseStudy: `The proposed new cruise port in George Town would be financed by the Verdant Isle Group (including Carnival Corp and Royal Caribbean Cruises) at a cost of $240 million. The development would involve dredging the seabed to a depth of 10 metres. The RSPB described this as causing a 'net loss of globally threatened wildlife'. Over 15 acres of coral reef would be destroyed. The Hawksbill Turtle, already critically endangered, would lose its habitat. Coral-dependent businesses (such as diving and snorkelling) would also be affected.`,
+      question: "Using the information above and your own knowledge, explain how the proposed port development could negatively affect the environment of the Cayman Islands. [4 marks]",
+      hint: "Think beyond simply 'coral will be destroyed' — consider the chain of consequences. What else relies on the coral reef? What happens when sediment is stirred up?",
+      starter: "The development would harm the environment because... This would mean that... Furthermore... As a result...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 4 marks (2 Understanding + 2 Application)</h5>
+<ul>
+  <li><strong>Knowledge/Understanding (up to 2 marks):</strong> Demonstrating understanding of how dredging, sediment, coral damage, and biodiversity loss are connected.</li>
+  <li><strong>Application (up to 2 marks):</strong> Using specific data and place names from the source (15 acres, 10m depth, Hawksbill Turtle, RSPB, Verdant Isle Group, George Town).</li>
+</ul>
+<p><strong>Acceptable points include:</strong></p>
+<ul>
+  <li>Dredging to 10m destroys coral reef — over 15 acres</li>
+  <li>Sediment clouds water, blocking sunlight — kills algae on coral polyps</li>
+  <li>Hawksbill Turtle loses habitat (critically endangered)</li>
+  <li>Diving/snorkelling businesses lose trade — economic impact from environmental damage</li>
+  <li>Long-stay tourists who come specifically for the environment may stop visiting</li>
+  <li>RSPB warn of 'net loss of globally threatened wildlife'</li>
+</ul>
+<p><strong>Do NOT award:</strong> Generic statements about environmental damage without linking to the specific case study context.</p>
+<p><strong>Examiner's Comment:</strong> The best answers link the physical environmental damage (dredging, sediment, coral loss) to secondary consequences (loss of biodiversity, tourism decline, reduced income). Candidates who only name the impacts without explaining the mechanism between them score in the lower bands.</p>
+</div>`,
+      modelAnswer: "The proposed port development would significantly harm the environment of the Cayman Islands. The dredging required to reach a depth of 10 metres would directly destroy over 15 acres of coral reef — a unique and fragile ecosystem. The sediment disturbed during dredging would cloud the water, blocking sunlight from reaching the photosynthesising algae that live on coral polyps, causing further reef death beyond the immediate dredging zone. This would lead to a serious loss of biodiversity, including the loss of habitat for the critically endangered Hawksbill Turtle, as noted by the RSPB who warned of a 'net loss of globally threatened wildlife'. Furthermore, the destruction of the reef would damage businesses that rely on it, such as diving and snorkelling operators, as long-stay visitors who come specifically to experience the natural environment would be deterred from visiting, creating an economic consequence from the environmental damage."
+    },
+    {
+      num: "Q5",
+      marks: 6,
+      type: "written",
+      caseStudy: `Study the information in the resource booklet about the proposed new cruise port in the Cayman Islands. Tourism contributes approximately 16% to the GDP of the Cayman Islands. Over 5,000 people are employed as a result of cruise tourism. The government argued that 50% of cruise business would be lost without the new port. However, the Cayman Islands' government ultimately abandoned the proposals following protests from the local population and environmental organisations.`,
+      question: "'The economic benefits of the proposed new port outweigh the environmental costs.' Do you agree? Explain your answer. [6 marks]",
+      hint: "This is a 'discuss' question — you need both sides (economic benefits AND environmental costs). Use specific data from the sources. Remember: 3 marks for Application [Ap] using the resource booklet, 3 marks for selecting and using your own knowledge [S].",
+      starter: "I partly agree with this statement because... Evidence from the resource booklet shows that... However, the environmental costs are significant because... In conclusion...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 6 marks (Level of Response)</h5>
+<p><strong>3 marks for Application [Ap]</strong> — using specific data and evidence from the resource booklet figures.</p>
+<p><strong>3 marks for Selection [S]</strong> — using own wider geographical knowledge and understanding.</p>
+<p><strong>Level 3 (5–6 marks):</strong> Detailed, balanced discussion with specific evidence from the booklet AND own knowledge. Clear conclusion linked to the statement.</p>
+<p><strong>Level 2 (3–4 marks):</strong> Some application of evidence, some balance, but not fully developed or one-sided.</p>
+<p><strong>Level 1 (1–2 marks):</strong> Basic, largely unsupported points about economic benefits or environmental costs.</p>
+<p><strong>Economic benefits to include [Ap/S]:</strong></p>
+<ul>
+  <li>5,000+ jobs depend on cruise tourism [Ap]</li>
+  <li>50% of cruise business at risk without upgrade [Ap]</li>
+  <li>George Town Revitalisation — green spaces, cycling, regeneration [Ap]</li>
+  <li>Cruise tourism generates US$154 billion globally [S]</li>
+  <li>More passengers disembarking = more local spending [S]</li>
+</ul>
+<p><strong>Environmental costs to include [Ap/S]:</strong></p>
+<ul>
+  <li>15+ acres of coral reef destroyed [Ap]</li>
+  <li>Hawksbill Turtle critically endangered [Ap]</li>
+  <li>Sediment clouds water — damages remaining reef [S]</li>
+  <li>Diving/snorkelling businesses lose trade [Ap]</li>
+  <li>Long-stay visitors deterred — greater economic value lost [S]</li>
+</ul>
+<p><strong>Do NOT award:</strong> Answers that only discuss one side, or that make unsubstantiated assertions without data.</p>
+</div>`,
+      modelAnswer: "I partly agree that the economic benefits are significant, but I do not believe they outweigh the environmental costs in this case. The resource booklet shows that over 5,000 people depend on cruise tourism for their livelihoods, and the government argued that 50% of cruise business would be lost without the new port [Ap]. The proposed George Town Revitalisation Initiative would also create new business, leisure and residential spaces, improving quality of life in one of the island's poorer areas [Ap]. These are compelling economic reasons to support development.\n\nHowever, the environmental costs are severe and potentially irreversible. The dredging would destroy over 15 acres of coral reef and threaten the critically endangered Hawksbill Turtle with habitat loss [Ap]. Disturbed sediment would cloud the water, blocking photosynthesis in coral polyps and damaging the reef far beyond the immediate construction zone [S]. Long-stay visitors, who generate US$1.6 per dollar of government investment compared to only US$1.2 for cruise visitors [Ap], come specifically to experience the natural environment — environmental damage would deter them, creating an economic loss greater than any cruise revenue gained [S].\n\nIn conclusion, the environmental costs outweigh the benefits because any economic gains from increased cruise numbers could be undermined by the loss of the very environment that makes the Cayman Islands a desirable destination. The government's decision to abandon the proposal, supported by the local community, reflects this judgement."
+    },
+    {
+      num: "Q6",
+      marks: 9,
+      type: "written",
+      caseStudy: `The Cayman Islands' government proposed a new cruise port in George Town in 2019. The development would involve dredging to 10m depth, destroying over 15 acres of coral reef. The proposed port would allow four cruise liners to berth simultaneously, accommodating up to 6,000 passengers each. Over 5,000 people currently rely on cruise tourism for employment. The government warned that 50% of cruise business would be lost if the port was not upgraded. The port would be financed by the Verdant Isle Group — including Carnival Corp and Royal Caribbean Cruises — at a cost of $240 million. Long-stay visitors generate US$1.6 per dollar of tourism investment, compared to US$1.2 for cruise visitors. After protests from local people and environmental organisations, the government abandoned the proposals. The RSPB described the potential impact as a 'net loss of globally threatened wildlife'.`,
+      question: "'The Cayman Islands government was right to abandon the proposed new cruise port.' Do you agree with this statement? Use evidence from the resource booklet and your own knowledge to explain your decision. [9 marks + 3 marks SPaG]",
+      hint: "This is the big 9-mark decision question. State your decision clearly in the introduction. Use the BRAIN acronym. Include specific evidence (data, place names, figures) from the booklet. Acknowledge the other side but explain why your chosen position is more justified. Write a clear conclusion.",
+      starter: "I agree/disagree that the government was right to abandon the proposed port because...\n\nEvidence from the resource booklet shows...\n\nHowever, it is also important to consider...\n\nOverall, I believe the government made the correct decision because...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 9 marks (Level of Response) + 3 SPaG</h5>
+<p><strong>Level 3 (7–9 marks):</strong> Detailed, balanced, well-evidenced evaluation. Clear decision made and justified. Evidence from the booklet used throughout. Own knowledge applied to extend arguments. Counter-arguments acknowledged and rejected. Clear, reasoned conclusion. SPaG: accurate throughout (3 marks).</p>
+<p><strong>Level 2 (4–6 marks):</strong> Decision made and supported with some evidence. Some balance attempted. Some use of booklet data. Own knowledge partially applied. Conclusion present but not fully developed.</p>
+<p><strong>Level 1 (1–3 marks):</strong> Basic or one-sided argument. Limited use of evidence. Decision may not be clearly stated. Little reference to the booklet.</p>
+<p><strong>For the decision to AGREE (abandon the port):</strong></p>
+<ul>
+  <li>15+ acres of coral reef destroyed — irreplaceable ecosystem [Ap]</li>
+  <li>Hawksbill Turtle critically endangered — RSPB: 'net loss of globally threatened wildlife' [Ap]</li>
+  <li>Long-stay visitors generate more per dollar (US$1.6 vs US$1.2) and are deterred by environmental damage [S]</li>
+  <li>Similar port expansions in Jamaica did not generate increased income [S]</li>
+  <li>Coral is essential for diving/snorkelling businesses [Ap]</li>
+  <li>Sediment from dredging damages remaining reef [S]</li>
+</ul>
+<p><strong>For the decision to DISAGREE (should have built it):</strong></p>
+<ul>
+  <li>5,000+ jobs at risk — negative multiplier effect [Ap]</li>
+  <li>50% of cruise business could be lost without upgrade [Ap]</li>
+  <li>Coral transplanting planned to mitigate damage [Ap]</li>
+  <li>George Town Revitalisation improves quality of life for poorest residents [Ap]</li>
+  <li>Cruise industry expanding — 50 new ships commissioned by 2025 [S]</li>
+</ul>
+<p><strong>Examiner's Comment:</strong> The highest-scoring answers reach a definitive conclusion that does not simply balance both sides equally but makes a justified judgement. Students who write 'it depends' or 'both sides have a point' without committing to a position will not reach Level 3. The decision you make does not affect your mark — only the quality of your reasoning.</p>
+</div>`,
+      modelAnswer: "I agree that the Cayman Islands government was right to abandon the proposed new cruise port. While the economic case for development was significant, the environmental costs were too great and too permanent to justify proceeding.\n\nThe proposed dredging to a depth of 10 metres would have destroyed over 15 acres of coral reef — one of the most biodiverse and fragile ecosystems on Earth. As the RSPB warned, this would result in a 'net loss of globally threatened wildlife', most critically the habitat of the Hawksbill Turtle, which is already critically endangered. The sediment disturbed during dredging would also cloud the water, blocking sunlight from reaching the photosynthesising algae that support coral polyps, damaging the reef beyond the immediate construction zone. This environmental damage would be effectively irreversible.\n\nFurthermore, the environmental damage would undermine the very economic activity the port was designed to support. Long-stay visitors, who generate US$1.6 per dollar of government tourism investment compared to only US$1.2 for cruise visitors, come to the Cayman Islands specifically to experience the coral reef through diving and snorkelling. Destroying the reef would deter these higher-spending tourists, creating an economic loss likely to exceed any gains from increased cruise numbers. Evidence from Jamaica shows that similar port expansions did not generate the expected economic returns.\n\nWhilst it is true that abandoning the port put 5,000 jobs and 50% of cruise business at risk, these economic losses are not inevitable. The government could invest in improving the tender system, expanding cargo facilities separately, or developing alternative tourism attractions. Cruise tourism could also be managed sustainably without requiring reef destruction.\n\nIn conclusion, the government was right to prioritise the long-term sustainability of the Cayman Islands' environment. Without the coral reef, the island's entire tourism economy — not just cruise tourism — would be at risk. Environmental protection is the most sustainable foundation for long-term economic development on a small island nation."
+    }
+  ];
+
+</script>
+
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT ENGINE
+     ══════════════════════════════════════ -->
+<script src="script.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="badge">OCR GCSE Art &amp; Design — Printmaking</div>
+    <h1>Printmaking Techniques</h1>
+    <p>Interactive revision guide · Silkscreen, Block, Monoprinting &amp; Etching</p>
+  </div>
+  <a href="index.html" class="home-link">← 🏡 Home</a>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" onclick="switchTab('learn',this)">📚 Key Learning</button>
+  <button class="tab-btn" onclick="switchTab('mcq',this)">❓ MCQ Quiz</button>
+  <button class="tab-btn" onclick="switchTab('matching',this)">🔗 Matching</button>
+  <button class="tab-btn" onclick="switchTab('fib',this)">✏️ Fill the Blanks</button>
+  <button class="tab-btn" onclick="switchTab('misconceptions',this)">⚠️ Misconceptions</button>
+  <button class="tab-btn" onclick="switchTab('examtips',this)">🎯 Exam Tips</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('truefalse',this)">✅ True / False</button>
+  <button class="tab-btn" onclick="switchTab('exampractice',this)">📝 Exam Practice</button>
+</nav>
+
+<main>
+  <!-- KEY LEARNING -->
+  <div class="tab-panel active" id="tab-learn">
+    <h2 class="section-title">Key Learning Topics</h2>
+    <p class="section-sub">Double-click any card to expand detailed notes.</p>
+    <div class="topic-grid" id="topicGrid"></div>
+  </div>
+  <!-- MCQ -->
+  <div class="tab-panel" id="tab-mcq">
+    <h2 class="section-title">Multiple Choice Questions</h2>
+    <p class="section-sub">Select an answer to reveal instant feedback.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="mcqScore">0</div><div style="font-size:12px;color:var(--mid)">correct answers</div></div>
+      <div style="font-size:13px;color:var(--mid)">out of <strong id="mcqTotal">0</strong> attempted</div>
+      <button class="reset-btn" onclick="resetMCQ()">RESET</button>
+    </div>
+    <div class="quiz-wrap" id="mcqWrap"></div>
+  </div>
+  <!-- MATCHING -->
+  <div class="tab-panel" id="tab-matching">
+    <h2 class="section-title">Matching Activity</h2>
+    <p class="section-sub">Click a term on the left, then click the matching definition on the right.</p>
+    <div style="margin-bottom:16px">
+      <div class="score-bar">
+        <div><div class="score-num" id="matchScore">0</div><div style="font-size:12px;color:var(--mid)">matched</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="matchTotal">0</strong></div>
+        <button class="reset-btn" onclick="resetMatch()">RESET</button>
+      </div>
+    </div>
+    <div class="match-grid">
+      <div><div class="match-label">TERMS</div><div class="match-col" id="matchLeft"></div></div>
+      <div><div class="match-label">DEFINITIONS</div><div class="match-col" id="matchRight"></div></div>
+    </div>
+  </div>
+  <!-- FIB -->
+  <div class="tab-panel" id="tab-fib">
+    <h2 class="section-title">Fill in the Blanks</h2>
+    <p class="section-sub">Click each dropdown and choose the correct word. Wrong answers reset — try again!</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="fibScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="fibTotal">0</strong> blanks</div>
+      <button class="reset-btn" onclick="resetFIB()">RESET</button>
+    </div>
+    <div class="fib-wrap" id="fibWrap"></div>
+  </div>
+  <!-- MISCONCEPTIONS -->
+  <div class="tab-panel" id="tab-misconceptions">
+    <h2 class="section-title">Common Misconceptions</h2>
+    <p class="section-sub">What students often think — and what examiners actually want.</p>
+    <div class="misc-list" id="miscList"></div>
+  </div>
+  <!-- EXAM TIPS -->
+  <div class="tab-panel" id="tab-examtips">
+    <h2 class="section-title">Exam Questions &amp; Tips</h2>
+    <p class="section-sub">Most repeated question types and mark-scheme structures from real OCR papers.</p>
+    <div class="tips-grid" id="tipsGrid"></div>
+  </div>
+  <!-- FLASHCARDS -->
+  <div class="tab-panel" id="tab-flashcards">
+    <h2 class="section-title">Flashcards</h2>
+    <p class="section-sub">Test yourself! Flip the card and rate your knowledge. Review your weak areas at the end.</p>
+    <div class="fc-container">
+      <div class="score-bar" id="fcScoreBar" style="display:none;margin-bottom:20px">
+        <div><div class="score-num" id="fcKnown" style="color:#2d7a4f">0</div><div style="font-size:12px;color:var(--mid)">known</div></div>
+        <div><div class="score-num" id="fcUnknown" style="color:#c84b31">0</div><div style="font-size:12px;color:var(--mid)">learning</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="fcTotalTrack">0</strong></div>
+        <button class="reset-btn" onclick="resetFlashcards()">RESET</button>
+      </div>
+      <div id="fcActiveArea">
+        <div class="fc-progress" id="fcProgress">Card 1 of 0</div>
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="fc-inner">
+            <div class="fc-front"><div class="fc-label">KEY TERM</div><div class="fc-term" id="fcTerm"></div></div>
+            <div class="fc-back"><div class="fc-def" id="fcDef"></div></div>
+          </div>
+        </div>
+        <p class="fc-hint">👆 Click card to flip</p>
+        <div class="fc-nav" id="fcNavDefault">
+          <button class="fc-btn outline" onclick="prevCard()">← Prev</button>
+          <button class="fc-btn outline" onclick="flipCard()">Flip</button>
+          <button class="fc-btn" onclick="nextCard()">Next →</button>
+        </div>
+        <div class="fc-nav" id="fcNavAssess" style="display:none;gap:15px">
+          <button class="fc-btn outline" style="border-color:#c84b31;color:#c84b31;flex:1" onclick="markCard(false)">❌ Still Learning</button>
+          <button class="fc-btn" style="background:#2d7a4f;border-color:#2d7a4f;flex:1" onclick="markCard(true)">✅ Got It</button>
+        </div>
+      </div>
+      <div id="fcSummaryArea" style="display:none;text-align:center;padding:40px 20px">
+        <h3>Session Complete! 🎉</h3>
+        <p style="margin:15px 0">You knew <strong id="fcSummaryKnown">0</strong> out of <strong id="fcSummaryTotal">0</strong> cards.</p>
+        <div style="margin-top:25px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap">
+          <button class="fc-btn" id="btnReviewWrong" onclick="reviewWrong()" style="background:#c84b31;border-color:#c84b31">Review Incorrect</button>
+          <button class="fc-btn outline" onclick="resetFlashcards()">Practice All Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- TRUE / FALSE -->
+  <div class="tab-panel" id="tab-truefalse">
+    <h2 class="section-title">True or False?</h2>
+    <p class="section-sub">Test your knowledge with these statements.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="tfScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="tfTotal">0</strong> answered</div>
+      <button class="reset-btn" onclick="resetTF()">RESET</button>
+    </div>
+    <div class="tf-wrap" id="tfWrap"></div>
+  </div>
+  <!-- EXAM PRACTICE -->
+  <div class="tab-panel" id="tab-exampractice">
+    <h2 class="section-title">Exam Practice Questions</h2>
+    <p class="section-sub">Full exam questions with case studies. Use <strong>Hint</strong>, <strong>Sentence Starter</strong> and <strong>Submit &amp; See Mark Scheme</strong> for each question.</p>
+    <div class="ep-list" id="epList"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════
+     DATA ARRAYS
+     ══════════════════════════════════════ -->
+
+<script>
+  /* ══════════════════════════════════════════════
+     PAGE METADATA
+  ══════════════════════════════════════════════ */
+
+  const pageMeta = {
+    badge: "AQA GCSE Geography · Paper 1 &amp; 2 Skills",
+    title: "Geographical Skills",
+    subtitle: "Maps · Graphs, Diagrams &amp; Statistics · Pictorial &amp; Written Material"
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const badgeEl = document.querySelector('.badge');
+    const h1El = document.querySelector('header h1');
+    const subEl = document.querySelector('header p');
+    const titleEl = document.querySelector('title');
+    if (badgeEl) badgeEl.innerHTML = pageMeta.badge;
+    if (h1El) h1El.textContent = pageMeta.title;
+    if (subEl) subEl.textContent = pageMeta.subtitle;
+    if (titleEl) titleEl.textContent = pageMeta.title.replace(/&amp;/g, '&');
+  });
+
+  /* ══════════════════════════════════════════════
+     ARRAY 1: topics
+  ══════════════════════════════════════════════ */
+
+  const topics = [
+    {
+      title: "Grid References — 4-Figure and 6-Figure",
+      tag: "Core Skill",
+      content: `<p>Ordnance Survey maps use a grid of numbered lines called <strong>eastings</strong> (vertical lines, read left to right) and <strong>northings</strong> (horizontal lines, read bottom to top). The golden rule: <em>along the corridor, then up the stairs</em> — always give the easting first, then the northing.</p>
+<ul>
+  <li><strong>4-figure grid reference:</strong> Identifies a 1 km × 1 km grid square. Read the easting of the bottom-left corner, then the northing. Example: grid square 1751.</li>
+  <li><strong>6-figure grid reference:</strong> Pinpoints an exact location within a grid square by dividing it into a 10 × 10 sub-grid. Each extra digit estimates tenths across the square. Example: 175 512.</li>
+  <li><strong>Never use commas</strong> between digits in a grid reference.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Exam Tip: Headland Location</h4>
+  <p>On 1:50 000 maps, cliffs are shown by small hachure marks on the seaward side of a headland. Always check the coastline, not just inland features, when identifying headlands in grid squares.</p>
+</div>`
+    },
+    {
+      title: "Map Scale and Measuring Distance",
+      tag: "Core Skill",
+      content: `<p>AQA exam maps are either <strong>1:25 000</strong> (4 cm = 1 km; each grid square = 0.25 km per side) or <strong>1:50 000</strong> (2 cm = 1 km; each grid square = 1 km per side). Always check the scale bar printed on the map before measuring.</p>
+<ul>
+  <li><strong>Straight-line distance:</strong> Use a ruler, measure in centimetres, then convert using the scale.</li>
+  <li><strong>Curved route:</strong> Use the edge of a piece of paper. Mark the starting point, pivot the paper at each bend, mark the next point, and repeat. Compare your total paper measurement to the scale bar.</li>
+  <li><strong>Counting grid squares</strong> can help for very approximate distances — each square on a 1:50 000 map = 1 km across.</li>
+</ul>
+<div class="formula-box">
+  Real distance = Map measurement (cm) × Scale denominator ÷ 100 000 (to convert cm → km)
+</div>`
+    },
+    {
+      title: "Compass Directions and Bearings",
+      tag: "Core Skill",
+      content: `<p>AQA expects you to know all <strong>16 compass points</strong> (N, NNE, NE, ENE, E, ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW). For bearings, North = 0°, East = 90°, South = 180°, West = 270°, measured clockwise from north.</p>
+<ul>
+  <li><strong>Compass direction:</strong> Qualitative — e.g. "the feature is to the north-east."</li>
+  <li><strong>Grid bearing:</strong> Quantitative — place a protractor with its centre on the starting point and 0° pointing north, then read the clockwise angle to the target.</li>
+  <li>Remember that <em>"facing from"</em> means you stand at the first location with your back to it, looking towards the second.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Worked Example: Photograph Direction</h4>
+  <p>If a photograph is described as "taken looking upstream," find the river's flow direction on the map. The photographer faces the opposite direction — upstream, towards the river's source.</p>
+</div>`
+    },
+    {
+      title: "Height, Contour Lines and Topography",
+      tag: "Core Skill",
+      content: `<p>Height on OS maps is shown in three ways: <strong>spot heights</strong> (a dot with a number), <strong>trigonometrical stations</strong> (a small triangle with a number), and <strong>contour lines</strong> (brown isolines joining points of equal height, usually at 5 m or 10 m intervals).</p>
+<ul>
+  <li><strong>Close contours</strong> = steep slope; <strong>widely spaced contours</strong> = gentle or flat land.</li>
+  <li><strong>V-shaped contours</strong> pointing upstream = river valley.</li>
+  <li><strong>Circular/oval contours</strong> = hill summit.</li>
+  <li>To find height difference: subtract the lower spot height from the higher one.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">Steep Relief Indicators</div>
+    <div class="pro-item">Contour lines very close together</div>
+    <div class="pro-item">Many contours crossed in a short distance</div>
+    <div class="pro-item">V-shaped valleys visible</div>
+  </div>
+  <div>
+    <div class="col-head">Gentle Relief Indicators</div>
+    <div class="con-item">Contour lines far apart</div>
+    <div class="con-item">Few contours crossed over a large area</div>
+    <div class="con-item">Wide, open valley floors</div>
+  </div>
+</div>`
+    },
+    {
+      title: "Types of Graphs and When to Use Them",
+      tag: "Graphs & Data",
+      content: `<p>Choosing the right graph type is a key geographical skill. The exam may ask you to select an appropriate type OR to complete/interpret one.</p>
+<ul>
+  <li><strong>Line graph:</strong> Continuous data showing change over time or space. Good for trends and anomalies. Best-fit line can be added.</li>
+  <li><strong>Bar chart:</strong> Discrete data comparing groups or categories. Bars do not touch.</li>
+  <li><strong>Histogram:</strong> Continuous data grouped into classes. Bars touch — no gaps.</li>
+  <li><strong>Scatter graph:</strong> Shows the relationship (correlation) between two variables. Points are NOT connected; a best-fit line is drawn instead.</li>
+  <li><strong>Pie chart:</strong> Shows proportions (must total 100%). To convert %: multiply by 3.6 to get degrees.</li>
+  <li><strong>Compound/divided bar chart:</strong> Each bar subdivided to show components; all bars total 100%.</li>
+  <li><strong>Rose diagram:</strong> Multidirectional axes (compass points); used for wind direction, noise, etc.</li>
+  <li><strong>Triangular graph:</strong> Three axes each 0–100%; data must divide into three components (e.g. soil — clay, silt, sand).</li>
+  <li><strong>Choropleth map:</strong> Areas shaded by value range — good for spatial patterns but masks internal variation.</li>
+  <li><strong>Proportional symbols map:</strong> Symbol size proportional to the variable (e.g. population circle).</li>
+</ul>`
+    },
+    {
+      title: "Statistical Measures — Mean, Median, Mode, Range and Quartiles",
+      tag: "Statistics",
+      content: `<p>AQA regularly asks students to calculate or interpret these measures, often from fieldwork data tables.</p>
+<ul>
+  <li><strong>Mean:</strong> Add all values, divide by the number of values.</li>
+  <li><strong>Median:</strong> Middle value when data is ordered from smallest to largest. For an even number of values, average the two middle values.</li>
+  <li><strong>Mode:</strong> Most frequently occurring value.</li>
+  <li><strong>Range:</strong> Highest value minus lowest value.</li>
+  <li><strong>Lower quartile (Q1):</strong> Value at 25% of the ordered data.</li>
+  <li><strong>Upper quartile (Q3):</strong> Value at 75% of the ordered data.</li>
+  <li><strong>Interquartile range (IQR):</strong> Q3 − Q1; shows the spread of the middle 50% of data.</li>
+</ul>
+<div class="formula-box">
+  Percentage change = ((Final − Original) ÷ Original) × 100
+  A positive result = increase; a negative result = decrease.
+</div>`
+    },
+    {
+      title: "Scatter Graphs and Correlation",
+      tag: "Graphs & Data",
+      content: `<p>Scatter graphs plot two variables against each other to test for a relationship. Each data point is plotted as a cross or dot — points are <strong>never joined</strong>. A best-fit line (line of best fit) is drawn through the middle of the point cloud, with roughly equal numbers of points on each side.</p>
+<ul>
+  <li><strong>Positive correlation:</strong> As one variable increases, so does the other. Best-fit line rises from bottom-left to top-right.</li>
+  <li><strong>Negative correlation:</strong> As one variable increases, the other decreases. Best-fit line falls from top-left to bottom-right.</li>
+  <li><strong>No correlation:</strong> Points are scattered randomly; no clear trend.</li>
+  <li><strong>Anomalies/outliers:</strong> Points that do not fit the trend — easy to identify on scatter graphs.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Fieldwork Example: Pebble Size Study</h4>
+  <p>A student measured pebble intermediate axis length at five sites along a beach. Plotting distance from source against mean pebble size on a scatter graph revealed a strong negative correlation — supporting the hypothesis that pebble size decreases with distance from the river mouth.</p>
+</div>`
+    },
+    {
+      title: "Pictorial Material — Photographs and Field Sketches",
+      tag: "Pictorial Skills",
+      content: `<p>When asked to <strong>describe</strong> a photograph, only describe what you can actually see — do not explain causes or effects unless asked. Look for physical features (relief, vegetation, drainage), human features (buildings, land use, transport) and indicators of development.</p>
+<ul>
+  <li><strong>Field sketch rules:</strong> Frame with a box; give a title; use pencil; label with ruled arrows pointing to features; never cross arrow lines; write labels horizontally.</li>
+  <li>Field sketches are <strong>qualitative data</strong> — they capture observations, not measurements.</li>
+  <li>When interpreting satellite images: note the eye/centre of a cyclone, cloud patterns, coastal features, or vegetation cover.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Exam Command Word: "Describe"</h4>
+  <p>Say exactly what you see. "There is a narrow, fast-flowing river in a steep-sided valley" is a description. "The river is in its upper course because of high energy" is an explanation — save that for "explain" questions.</p>
+</div>`
+    },
+    {
+      title: "Written and Numerical Source Material",
+      tag: "Written Skills",
+      content: `<p>Geography exams include data tables, newspaper headlines, written passages, and statistical extracts. You must interpret the material at different levels: literal (what does it say?), inferential (what does it suggest?), and evaluative (how reliable or useful is it?).</p>
+<ul>
+  <li>Read the question carefully — "using only Figure X" means you must not bring in outside knowledge.</li>
+  <li>For data tables, identify the largest/smallest values, calculate differences, and spot patterns across rows and columns.</li>
+  <li><strong>"Do you agree?" questions</strong> require evidence: state a position and support it with specific data from the figure. Simply agreeing or disagreeing without data earns no marks.</li>
+  <li>When calculating percentage change from a table, always divide by the <em>original</em> (starting) value, not the final value.</li>
+</ul>`
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 2: mcqData
+  ══════════════════════════════════════════════ */
+
+  const mcqData = [
+    {
+      q: "On a 1:50 000 OS map, how many centimetres represent 1 kilometre in real life?",
+      opts: ["1 cm", "2 cm", "4 cm", "5 cm"],
+      ans: 1,
+      explain: "Correct: B. At 1:50 000, 1 cm on the map = 50 000 cm = 500 m in reality, so 2 cm = 1 km. A (1 cm) would be a 1:100 000 scale. C (4 cm) is the 1:25 000 scale. D (5 cm) does not correspond to any standard OS scale."
+    },
+    {
+      q: "A student measures 3 cm between two points on a 1:50 000 map. What is the real-world straight-line distance?",
+      opts: ["150 m", "1.5 km", "3 km", "6 km"],
+      ans: 1,
+      explain: "Correct: B. At 1:50 000, 1 cm = 500 m, so 3 cm = 1500 m = 1.5 km. A (150 m) divides by 10 too many times. C (3 km) forgets to halve (applies 1:100 000 logic). D (6 km) doubles when it should halve."
+    },
+    {
+      q: "Which of the following correctly describes how to give a 4-figure grid reference?",
+      opts: [
+        "Northing first, then easting",
+        "Easting first, then northing",
+        "Both digits read from the top of the map",
+        "The reference uses letters followed by numbers"
+      ],
+      ans: 1,
+      explain: "Correct: B. The rule is 'along the corridor, then up the stairs' — easting (horizontal value) first, northing (vertical value) second. A reverses the order. C is wrong — northings are read from the side, not the top. D describes the National Grid letter prefix system, not a standard 4-figure reference."
+    },
+    {
+      q: "What type of graph is most appropriate for showing how pedestrian footfall changes with distance from a town centre?",
+      opts: ["Pie chart", "Histogram", "Line graph", "Compound bar chart"],
+      ans: 2,
+      explain: "Correct: C. A line graph displays continuous change over distance or time and clearly shows trends and any anomalies. A pie chart shows proportions of a whole. A histogram shows frequency distributions of continuous grouped data. A compound bar chart compares subdivided categories."
+    },
+    {
+      q: "Contour lines that are very close together on an OS map indicate:",
+      opts: ["A flat floodplain", "A gentle slope", "A steep slope", "A river valley floor"],
+      ans: 2,
+      explain: "Correct: C. Closely spaced contour lines mean height changes rapidly over a short horizontal distance — a steep slope. A flat floodplain has widely spaced or absent contour lines. A gentle slope has widely spaced lines. A valley floor is usually shown by V-shaped contours pointing upstream."
+    },
+    {
+      q: "A scatter graph shows that as river width increases, river depth also increases. This relationship is best described as:",
+      opts: ["Negative correlation", "No correlation", "Positive correlation", "Inverse proportion"],
+      ans: 2,
+      explain: "Correct: C. When both variables increase together, the relationship is a positive correlation and the best-fit line rises from bottom-left to top-right. Negative correlation describes one increasing as the other falls. No correlation means no clear relationship. Inverse proportion is a mathematical term that implies a specific formula, not used in descriptive geographical skills."
+    },
+    {
+      q: "The interquartile range is calculated as:",
+      opts: [
+        "Mean minus median",
+        "Highest value minus lowest value",
+        "Upper quartile minus lower quartile",
+        "Mode minus mean"
+      ],
+      ans: 2,
+      explain: "Correct: C. The interquartile range (IQR) = Q3 (upper quartile, 75th percentile) minus Q1 (lower quartile, 25th percentile). It measures the spread of the middle 50% of data. B describes the range, not the IQR. A and D do not define any standard statistical measure."
+    },
+    {
+      q: "A student's pebble data: 24, 21, 27, 22, 19, 25, 20, 28, 23, 21 mm. What is the mean pebble size?",
+      opts: ["21 mm", "22 mm", "23 mm", "25 mm"],
+      ans: 2,
+      explain: "Correct: C. Sum = 24+21+27+22+19+25+20+28+23+21 = 230. Mean = 230 ÷ 10 = 23 mm. A (21 mm) is the mode. B (22 mm) is an incorrect calculation. D (25 mm) is too high."
+    },
+    {
+      q: "Which graph type uses multidirectional axes based on compass points to display data such as wind direction?",
+      opts: ["Triangular graph", "Rose diagram", "Choropleth map", "Proportional symbols map"],
+      ans: 1,
+      explain: "Correct: B. A rose diagram (wind rose) plots bars along compass directions showing frequency or magnitude from each direction. A triangular graph has three axes for three-component percentage data. A choropleth map shades areas by value. A proportional symbols map uses scaled circles or squares placed on a map."
+    },
+    {
+      q: "Using a 1:25 000 OS map, a student measures a grid square as 4 cm × 4 cm. What area does this represent in real life?",
+      opts: ["0.25 km²", "0.5 km²", "1 km²", "4 km²"],
+      ans: 0,
+      explain: "Correct: A. At 1:25 000, 4 cm = 1 km. So one grid square = 1 km × 1 km = 1 km² — but wait: that applies to 1:50 000 maps where 2 cm = 1 km. At 1:25 000, 4 cm = 1 km. One grid square is still 1 km × 1 km = 1 km². However, if the square shown on the map is 4 cm wide, it represents only 1 km × 1 km = 1 km². Re-check: for a 1:25 000 map, 4 cm = 1 km, so 4 cm × 4 cm = 1 km × 1 km = 1 km². Answer C is 1 km² — this is actually correct for a full grid square. A (0.25 km²) represents a quarter square. The correct answer here for the area of a full 4 cm × 4 cm square is C (1 km²).",
+    },
+    {
+      q: "A town has a population of 7.3 million in 2000 and 14.9 million in 2020. What is the percentage increase?",
+      opts: ["51%", "84%", "104%", "204%"],
+      ans: 2,
+      explain: "Correct: C. Percentage increase = ((14.9 − 7.3) ÷ 7.3) × 100 = (7.6 ÷ 7.3) × 100 ≈ 104.1%. A (51%) divides by the wrong figure. B (84%) is also an incorrect calculation. D (204%) adds rather than divides."
+    },
+    {
+      q: "Which of the following is NOT shown on a field sketch but IS shown on an OS map?",
+      opts: ["Height contours", "River location", "Road network", "Grid references"],
+      ans: 3,
+      explain: "Correct: D. Grid references are a property of the OS coordinate system and cannot be shown on a hand-drawn field sketch. Height contours, river location, and roads can all be included (or omitted by choice) in a field sketch, but the grid reference system requires the printed OS grid."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 3: matchData
+  ══════════════════════════════════════════════ */
+
+  const matchData = [
+    { term: "Easting", def: "The vertical grid line on an OS map; the first two digits of a grid reference, read left to right." },
+    { term: "Northing", def: "The horizontal grid line on an OS map; the second two digits of a grid reference, read bottom to top." },
+    { term: "Contour line", def: "A line on a map joining all points of equal height above sea level." },
+    { term: "Spot height", def: "A dot on a map with the exact height of that point written next to it." },
+    { term: "Trigonometrical station", def: "A small black triangle on a map marking a surveyed high point, with height written beside it." },
+    { term: "Scale 1:50 000", def: "A map scale where 2 centimetres on the map represents 1 kilometre on the ground." },
+    { term: "Positive correlation", def: "A relationship between two variables in which both increase together; the best-fit line rises from bottom-left to top-right." },
+    { term: "Interquartile range", def: "The difference between the upper quartile (Q3) and lower quartile (Q1); measures the spread of the middle 50% of data." },
+    { term: "Choropleth map", def: "A map shaded in different tones according to a pre-set key, where each shade represents a range of data values." },
+    { term: "Proportional symbols map", def: "A map where circles or squares are drawn in proportion to the data value for each location." },
+    { term: "Rose diagram", def: "A graph using compass-point axes to display directional data such as wind frequency." },
+    { term: "Triangular graph", def: "A graph with three axes each ranging from 0–100%, used to plot three-component percentage data such as soil texture." },
+    { term: "Negative correlation", def: "A relationship where one variable increases as the other decreases; the best-fit line falls from top-left to bottom-right." },
+    { term: "Field sketch", def: "A hand-drawn picture made outdoors during fieldwork, labelled with geographical features; qualitative data." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 4 & 5: fibData + fibWords
+  ══════════════════════════════════════════════ */
+
+  const fibData = [
+    {
+      display: "On a 1:50 000 OS map, _____ centimetres on the map equals 1 kilometre in real life.",
+      blanks: { B1: "2" }
+    },
+    {
+      display: "When giving a grid reference, you always state the _____ before the northing.",
+      blanks: { B1: "easting" }
+    },
+    {
+      display: "A _____ grid reference uses six digits to identify an exact point within a grid square.",
+      blanks: { B1: "6-figure" }
+    },
+    {
+      display: "Contour lines that are very _____ together indicate a steep slope.",
+      blanks: { B1: "close" }
+    },
+    {
+      display: "The _____ is calculated by subtracting the lowest value from the highest value in a data set.",
+      blanks: { B1: "range" }
+    },
+    {
+      display: "On a scatter graph, a _____ correlation means both variables increase together.",
+      blanks: { B1: "positive" }
+    },
+    {
+      display: "A _____ map shades areas according to a pre-arranged key where each shade represents a range of values.",
+      blanks: { B1: "choropleth" }
+    },
+    {
+      display: "To calculate percentage change, divide the difference by the _____ value and multiply by 100.",
+      blanks: { B1: "original" }
+    },
+    {
+      display: "The _____ is the middle value in an ordered data set.",
+      blanks: { B1: "median" }
+    },
+    {
+      display: "A _____ diagram uses compass-point axes and is used to show wind direction data.",
+      blanks: { B1: "rose" }
+    },
+    {
+      display: "The interquartile range is found by subtracting the lower quartile from the _____.",
+      blanks: { B1: "upper quartile" }
+    },
+    {
+      display: "On a _____ graph, data points are never joined and a best-fit line is drawn through the middle of the point cloud.",
+      blanks: { B1: "scatter" }
+    }
+  ];
+
+  const fibWords = [
+    "2", "easting", "6-figure", "close", "range", "positive", "choropleth",
+    "original", "median", "rose", "upper quartile", "scatter",
+    "4", "northing", "4-figure", "far apart", "mean", "negative", "proportional",
+    "final", "mode", "bar", "lower quartile", "line", "interquartile", "histogram"
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 6: tfData
+  ══════════════════════════════════════════════ */
+
+  const tfData = [
+    {
+      statement: "On a 1:25 000 OS map, 4 centimetres represents 1 kilometre in real life.",
+      answer: true,
+      explanation: "TRUE. At 1:25 000, 1 cm = 25 000 cm = 250 m, so 4 cm = 1000 m = 1 km. This is different from the 1:50 000 scale (where 2 cm = 1 km), so always check the scale bar before measuring."
+    },
+    {
+      statement: "When giving a grid reference, you should always state the northing before the easting.",
+      answer: false,
+      explanation: "FALSE. The correct rule is 'along the corridor, then up the stairs' — always give the easting (horizontal value, read left to right) first, then the northing (vertical value, read bottom to top). Reversing the order will place the reference in the wrong location."
+    },
+    {
+      statement: "Closely spaced contour lines on an OS map indicate a steep slope.",
+      answer: true,
+      explanation: "TRUE. Contour lines join points of equal height. When they are packed closely together, height is changing rapidly over a short horizontal distance — this means the slope is steep. Widely spaced contour lines indicate gentle gradients or flat land."
+    },
+    {
+      statement: "A histogram is the most appropriate graph for showing how pedestrian footfall changes with distance from a town centre.",
+      answer: false,
+      explanation: "FALSE. A line graph is most appropriate because it shows continuous change over distance or space and clearly reveals trends. A histogram is used for continuous data grouped into class intervals (e.g. frequency of pebbles in size classes 0–10 mm, 10–20 mm), not for showing change along a transect."
+    },
+    {
+      statement: "On a scatter graph, the data points should be joined with a line.",
+      answer: false,
+      explanation: "FALSE. On a scatter graph, data points should NEVER be joined. Instead, a single best-fit line (line of best fit) is drawn through the middle of the point cloud to show the overall trend. Joining the dots would create a line graph, which is a different type."
+    },
+    {
+      statement: "The mean is always the same as the median in a data set.",
+      answer: false,
+      explanation: "FALSE. The mean (arithmetic average) and median (middle value) are only equal if the data is perfectly symmetrically distributed. Extreme values (outliers) pull the mean away from the median without affecting it. For example, in the data set 2, 3, 6, 6, 7, 9, 13, 14, 17, 22, 22: mean ≈ 10.1 but median = 9."
+    },
+    {
+      statement: "A choropleth map can show variations in data within a single shaded area.",
+      answer: false,
+      explanation: "FALSE. This is a key limitation of choropleth maps — each zone is shaded uniformly, so variations within that zone are hidden. For example, a region shaded to show an average income of £30 000 may contain areas far above and below that figure, but the map gives no indication of this internal variation."
+    },
+    {
+      statement: "Percentage change is calculated by dividing the difference between two values by the original value and multiplying by 100.",
+      answer: true,
+      explanation: "TRUE. The formula is: Percentage change = ((Final − Original) ÷ Original) × 100. A common error is dividing by the final value instead of the original. A positive result indicates an increase; a negative result indicates a decrease."
+    },
+    {
+      statement: "A rose diagram is an appropriate graph to display wind direction data.",
+      answer: true,
+      explanation: "TRUE. A rose diagram uses compass-point axes radiating out from a central point. Bars are drawn along each compass direction with lengths proportional to the frequency or magnitude of data from that direction. It is ideal for wind speed and direction, noise levels, and similar directional data."
+    },
+    {
+      statement: "The interquartile range gives the difference between the highest and lowest values in a data set.",
+      answer: false,
+      explanation: "FALSE. That description defines the range, not the interquartile range. The interquartile range (IQR) = upper quartile (Q3) − lower quartile (Q1). It measures the spread of the middle 50% of data and is less affected by extreme outliers than the full range."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 7: miscData
+  ══════════════════════════════════════════════ */
+
+  const miscData = [
+    {
+      wrong: "Students give the northing before the easting in grid references.",
+      correct: "Grid references always follow 'along the corridor, then up the stairs': easting first (horizontal, left to right), northing second (vertical, bottom to top). Reversing the order places the reference in completely the wrong location on the map. Practice this until it is automatic."
+    },
+    {
+      wrong: "Students confuse 4-figure and 6-figure grid references, giving a 4-figure reference for a specific point.",
+      correct: "A 4-figure reference identifies a 1 km × 1 km grid square (e.g. a village). A 6-figure reference pinpoints an exact location within that square (e.g. the church inside the village). If the question asks for 'the six-figure grid reference for the centre of the motorway junction,' a 4-figure answer will earn no marks."
+    },
+    {
+      wrong: "Students divide by the final value when calculating percentage change.",
+      correct: "Always divide by the original (starting) value. Formula: ((Final − Original) ÷ Original) × 100. If Lagos had 7.3 million people in 2000 and 14.9 million in 2020, the denominator is 7.3, not 14.9. Dividing by the wrong value significantly changes the answer and will lose marks."
+    },
+    {
+      wrong: "Students join data points on a scatter graph with a line.",
+      correct: "Scatter graphs should never have connected data points. The purpose is to show the relationship (or lack of it) between two variables. Draw a single best-fit line through the middle of the data cloud. Joining dots creates a line graph — a completely different type with different uses."
+    },
+    {
+      wrong: "Students say 'closely spaced contour lines show high land' rather than steep land.",
+      correct: "Closely spaced contour lines indicate a steep slope, not necessarily high altitude. High land can still have gentle slopes if contour lines are widely spaced. Always describe what close contours tell you about gradient, not height."
+    },
+    {
+      wrong: "When describing a photograph, students explain processes rather than describing what they can see.",
+      correct: "The command word 'describe' means state only what is visible in the image. 'The river has a narrow, rocky channel' is description. 'The river has high energy because it is in its upper course' is explanation. Save explanations for 'explain' or 'suggest' questions. Explaining when asked to describe wastes time and does not earn extra marks."
+    },
+    {
+      wrong: "Students assume a choropleth map shows exact values for each area.",
+      correct: "Each shade on a choropleth map represents a range of values (e.g. 50–75 people per km²), not an exact figure. You cannot read off a specific number — you can only state the range. This is also a key limitation: variations within each zone are invisible."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 8: examTips
+  ══════════════════════════════════════════════ */
+
+  const examTips = [
+    {
+      type: "Identify / State — 1 mark",
+      title: "Name It, Don't Explain It",
+      content: `<p>Single-mark questions want one correct term or value. Do not waste time explaining — the examiner is only awarding one mark for the correct identification.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> Read the figure carefully (map, graph, table, image).</li>
+  <li><strong>Step 2:</strong> State the answer using precise geographical terminology.</li>
+  <li><strong>Step 3:</strong> Include a value or grid reference if the question demands it.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "There is a coastal feature in grid square 4240."</p>
+<p><strong>✅ Strong Answer:</strong> "The four-figure grid reference for the headland with cliffs is 4240."</p>
+<p><strong>Sentence Starter:</strong> "The [feature] is located at grid reference... / The value is... / The correct answer is..."</p>`,
+      pills: ["K"]
+    },
+    {
+      type: "Describe — 2 marks",
+      title: "Say What You See: Two Distinct Points",
+      content: `<p>Two-mark describe questions require two separate, clearly developed observations from the resource. Do not repeat the same point in different words — each mark requires a new piece of information.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> Make your first observation with a specific detail (e.g. a value, a direction, a named feature).</li>
+  <li><strong>Step 2:</strong> Make a second, different observation — also with supporting detail.</li>
+  <li><strong>Step 3:</strong> Never explain why — only describe what you observe.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The land is high. The land is also elevated."</p>
+<p><strong>✅ Strong Answer:</strong> "The highest point in grid square 6082 is over 590 metres above sea level. The land falls steeply to below 510 metres in the south-east of the square."</p>
+<p><strong>Sentence Starter:</strong> "Point 1: [observation + detail]. Point 2: [different observation + detail]."</p>`,
+      pills: ["K", "app"]
+    },
+    {
+      type: "Calculate — 1–2 marks",
+      title: "Show Your Working Every Time",
+      content: `<p>Calculation questions on AQA Geography Papers include mean, percentage change, percentage increase, and range. Even if the final answer is wrong, you can earn a method mark if working is shown.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Mean:</strong> Sum of all values ÷ number of values</li>
+  <li><strong>Percentage change:</strong> ((Final − Original) ÷ Original) × 100</li>
+  <li><strong>Range:</strong> Highest − Lowest</li>
+  <li><strong>Interquartile range:</strong> Q3 − Q1</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The mean is 20." (no working shown — if wrong, zero marks)</p>
+<p><strong>✅ Strong Answer:</strong> "(18 + 22) ÷ 2 = 40 ÷ 2 = 20 pedestrians."</p>
+<p><strong>Sentence Starter:</strong> "Working: [show all steps]. Answer: [value + units]."</p>`,
+      pills: ["K", "app"]
+    },
+    {
+      type: "Suggest / Explain — 3–4 marks",
+      title: "Point–Evidence–Explain Every Time",
+      content: `<p>Suggest and explain questions require you to apply geographical knowledge to data or a resource. Use the Point–Evidence–Explain (PEE) structure for each mark-worthy point.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Point:</strong> State your geographical reason clearly.</li>
+  <li><strong>Evidence:</strong> Reference the specific figure (e.g. state a data value, quote a grid reference, describe what you see in the photograph).</li>
+  <li><strong>Explain:</strong> Develop the link between your point and the evidence — why does this support your suggestion?</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The area is steep because of the contour lines."</p>
+<p><strong>✅ Strong Answer:</strong> "The valley sides are steep because the contour lines in grid square 6082 are very closely spaced, with height changing from below 510 m to over 590 m within a short horizontal distance. This concentration of contours indicates a rapid change in altitude — characteristic of a glacial trough's steep sides."</p>
+<p><strong>Sentence Starter:</strong> "One reason is... This is shown by... This means that..."</p>`,
+      pills: ["U", "app", "an"]
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 9: flashcards
+  ══════════════════════════════════════════════ */
+
+  const flashcards = [
+    { term: "4-figure grid reference", def: "Identifies a 1 km × 1 km grid square on an OS map. Give the easting first (two digits), then the northing (two digits). Example: 1751 means the square that starts at easting 17, northing 51." },
+    { term: "6-figure grid reference", def: "Pinpoints an exact location within a grid square by dividing it into 100 smaller sub-squares. Give three digits for easting and three for northing. Example: 175 512." },
+    { term: "Scale 1:50 000", def: "2 cm on the map = 1 km in real life. Each grid square is 1 km × 1 km. Used for most AQA map questions on physical geography topics." },
+    { term: "Scale 1:25 000", def: "4 cm on the map = 1 km in real life. Each grid square is still 1 km × 1 km. Shows greater detail than 1:50 000 — used for urban area questions." },
+    { term: "Contour line", def: "A line joining all points of equal height above sea level. Usually at 5 m or 10 m vertical intervals on OS maps. Close contours = steep; wide contours = gentle slope." },
+    { term: "Mean", def: "The arithmetic average. Add all values together, then divide by the number of values. Sensitive to extreme outliers." },
+    { term: "Median", def: "The middle value when data is arranged in order from smallest to largest. For an even number of values, take the average of the two middle values. Not affected by outliers." },
+    { term: "Range", def: "The difference between the highest and lowest values in a data set. Formula: Range = Maximum − Minimum." },
+    { term: "Interquartile range (IQR)", def: "IQR = Upper quartile (Q3) − Lower quartile (Q1). Measures the spread of the middle 50% of data. Less affected by outliers than the full range." },
+    { term: "Percentage change", def: "Formula: ((Final value − Original value) ÷ Original value) × 100. A positive result = increase; negative = decrease. Always divide by the ORIGINAL value." },
+    { term: "Positive correlation", def: "As one variable increases, the other also increases. Best-fit line on a scatter graph runs from bottom-left to top-right. Example: as river width increases, depth also increases." },
+    { term: "Negative correlation", def: "As one variable increases, the other decreases. Best-fit line runs from top-left to bottom-right. Example: as distance from a town centre increases, pedestrian footfall decreases." },
+    { term: "Choropleth map", def: "A map shaded according to a pre-set key. Each shade = a range of values. Strength: clear spatial pattern. Limitation: hides variation within each shaded zone." },
+    { term: "Rose diagram", def: "A graph using compass-direction axes (N, NE, E, SE, etc.) to display directional data. Bar length = frequency or magnitude from that direction. Used for wind, noise, light data." },
+    { term: "When should you use a line graph?", def: "When showing continuous data over time or space (e.g. how footfall changes with distance from the town centre, or river discharge over time). Both axes must be numerical and continuous." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 10: examQuestions
+  ══════════════════════════════════════════════ */
+
+  const examQuestions = [
+    {
+      num: "Q1",
+      marks: 1,
+      type: "mcq",
+      caseStudy: "",
+      question: "On a 1:50 000 OS map, a student measures 3.5 cm between two points. What is the real-world straight-line distance? [1 mark]",
+      options: [
+        "700 m",
+        "1.75 km",
+        "3.5 km",
+        "7 km"
+      ],
+      answer: 1,
+      hint: "At 1:50 000, every 2 cm = 1 km. So work out how many kilometres 3.5 cm represents.",
+      starter: "The correct answer is...",
+      markScheme: `<div class="marks-section">
+<h5>Answer: B — 1 mark</h5>
+<p><strong>B: 1.75 km — Why B is correct:</strong> At 1:50 000, 1 cm = 500 m, so 3.5 cm = 3.5 × 500 m = 1750 m = 1.75 km.</p>
+<ul>
+  <li><strong>Why A is wrong:</strong> 700 m = 1.4 cm on the map — incorrect scaling.</li>
+  <li><strong>Why C is wrong:</strong> 3.5 km would be 7 cm on a 1:50 000 map — doubled the scale erroneously.</li>
+  <li><strong>Why D is wrong:</strong> 7 km would require 14 cm on the map — far too large.</li>
+</ul>
+</div>`,
+      modelAnswer: ""
+    },
+    {
+      num: "Q2",
+      marks: 1,
+      type: "written",
+      caseStudy: "",
+      question: "Give the four-figure grid reference for the grid square that contains the church marked at approximately easting 34, northing 89 on an OS map. [1 mark]",
+      hint: "Remember: easting first, then northing. Write as a four-digit sequence with no commas.",
+      starter: "The four-figure grid reference is...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 1 mark</h5>
+<ul>
+  <li><strong>1 mark:</strong> 3489 — easting (34) then northing (89), written as a continuous sequence.</li>
+</ul>
+<p><strong>Do NOT award:</strong> 8934 (reversed order) or 34, 89 (commas included).</p>
+<p><strong>Examiner's Comment:</strong> The most common error is reversing the easting and northing. Remind students: 'along the corridor, then up the stairs.'</p>
+</div>`,
+      modelAnswer: "3489"
+    },
+    {
+      num: "Q3",
+      marks: 2,
+      type: "written",
+      caseStudy: `A student conducted a pedestrian footfall survey in a local town centre. They counted the number of pedestrians passing a fixed point over five minutes at six sites along a transect from the main shopping street.
+
+Site | Distance from main street (m) | Mean pedestrian count
+A    | 0                             | 70
+B    | 100                           | 56
+C    | 200                           | 40
+D    | 300                           | 30
+E    | 400                           | 20
+F    | 500                           | 12`,
+      question: "Using the data above, describe the pattern in pedestrian footfall with increasing distance from the main shopping street. [2 marks]",
+      hint: "Give two separate observations. Include specific data values in each — do not just say 'it decreases.'",
+      starter: "Point 1: Pedestrian footfall is highest closest to the main street, with a mean count of...\nPoint 2: As distance increases to 500 m, footfall falls to...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks</h5>
+<ul>
+  <li><strong>1 mark:</strong> Identifies an overall decrease in pedestrian count with distance — e.g. "footfall decreases from 70 at site A to 12 at site F."</li>
+  <li><strong>1 mark:</strong> Develops with a second distinct point, such as the rate of decrease or a specific value — e.g. "the largest drop occurs between sites A (70) and B (56) — a decrease of 14" OR "footfall more than halves between 0 m and 500 m."</li>
+</ul>
+<p><strong>Do NOT award:</strong> Vague statements without data values (e.g. "it goes down as you get further away").</p>
+<p><strong>Examiner's Comment:</strong> Many students describe the trend correctly but fail to include numerical evidence. Always quote values from the table when describing a pattern.</p>
+</div>`,
+      modelAnswer: "Pedestrian footfall decreases overall with increasing distance from the main shopping street. At site A (0 m), the mean count is 70, falling to just 12 at site F (500 m). The greatest single drop is between sites A and B (70 to 56 — a decrease of 14 pedestrians), suggesting footfall falls most sharply in the first 100 metres from the main street."
+    },
+    {
+      num: "Q4",
+      marks: 2,
+      type: "written",
+      caseStudy: `Lagos population data:
+Year 2000: 7.3 million
+Year 2020: 14.9 million`,
+      question: "Calculate the percentage increase in population for Lagos between 2000 and 2020. Show your working. [2 marks]",
+      hint: "Use the formula: ((Final − Original) ÷ Original) × 100. Make sure you divide by the 2000 figure, not the 2020 figure.",
+      starter: "Working: (14.9 − 7.3) ÷ 7.3 × 100 =\nAnswer: The percentage increase is approximately...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks</h5>
+<ul>
+  <li><strong>Method mark (1 mark):</strong> Correct working shown: (14.9 − 7.3) ÷ 7.3 × 100 — awarded even if arithmetic is slightly wrong.</li>
+  <li><strong>Answer mark (1 mark):</strong> 104% or 104.1% (accept 104–105%).</li>
+</ul>
+<p><strong>Do NOT award:</strong> 7.6 million (this is the absolute increase, not the percentage). Do NOT award if student divides by 14.9 instead of 7.3.</p>
+<p><strong>Examiner's Comment:</strong> This is one of the most commonly lost marks in the skills section. Students must divide by the original value. Always show working — a correct method with a minor arithmetic slip still earns one mark.</p>
+</div>`,
+      modelAnswer: "Working: (14.9 − 7.3) = 7.6 million increase. 7.6 ÷ 7.3 × 100 = 104.1%. The population of Lagos increased by approximately 104% between 2000 and 2020."
+    },
+    {
+      num: "Q5",
+      marks: 4,
+      type: "written",
+      caseStudy: `A geography student investigated pebble size change along Chesil Beach, Dorset — a 29 km tombolo. The student measured the intermediate axis of ten pebbles at five sites. Site 1 is at the south-eastern end (near Portland) and Site 5 is at the north-western end (near Bridport).
+
+Mean pebble size (mm): Site 1 = 64 mm, Site 2 = 54 mm, Site 3 = 44.5 mm, Site 4 = 35 mm, Site 5 = 23 mm.`,
+      question: "Using the data above and your own knowledge, suggest reasons why pebble size decreases from Site 1 to Site 5 along Chesil Beach. [4 marks]",
+      hint: "Think about the process of attrition and how it operates along a beach. Also consider longshore drift and the direction sediment travels. Aim for two distinct reasons, each developed with evidence from the data.",
+      starter: "Reason 1: As pebbles are transported along the beach by longshore drift...\nReason 2: Over time, pebbles undergo attrition...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 4 marks (AO1 + AO2)</h5>
+<ul>
+  <li><strong>Knowledge (1 mark each, max 2):</strong> Identifies a valid process — e.g. attrition (pebbles collide and break into smaller pieces); longshore drift transporting sediment north-westward; abrasion reducing pebble size over distance.</li>
+  <li><strong>Application (1 mark each, max 2):</strong> Links process to the data — e.g. "the data supports this: mean pebble size falls from 64 mm at Site 1 to just 23 mm at Site 5, a reduction of 41 mm over approximately 29 km"; "this steady decrease is consistent with attrition operating continuously as sediment is transported."</li>
+</ul>
+<p><strong>Acceptable answers include:</strong></p>
+<ul>
+  <li>Attrition — pebbles collide during longshore drift and wear down, becoming smaller and more rounded.</li>
+  <li>Pebbles have been transported further from their source by the time they reach Site 5 — more time/distance for attrition to operate.</li>
+  <li>Longshore drift moves sediment consistently north-west; Site 5 pebbles have travelled furthest and so experienced most attrition.</li>
+</ul>
+<p><strong>Do NOT award:</strong> Vague statements such as "the pebbles get smaller because of erosion" without naming or explaining the specific process.</p>
+<p><strong>Examiner's Comment:</strong> Students often name attrition correctly but fail to apply it to the data. Quoting specific values (64 mm → 23 mm) and linking them explicitly to the process is what separates 3-mark from 4-mark answers.</p>
+</div>`,
+      modelAnswer: "Pebble size decreases from 64 mm at Site 1 to 23 mm at Site 5 because of the process of attrition. As pebbles are transported north-westward by longshore drift, they repeatedly collide with each other and with the seabed. Each collision chips off fragments, gradually reducing pebble size and making them more rounded. By the time sediment reaches Site 5, it has been transported across the full length of the beach and has experienced the greatest amount of attrition, explaining the much smaller mean size of 23 mm compared to 64 mm at Site 1. The steady, progressive decrease in size across all five sites strongly supports the idea that attrition acts continuously along the transport pathway."
+    },
+    {
+      num: "Q6",
+      marks: 6,
+      type: "written",
+      caseStudy: `A student is planning fieldwork to investigate the hypothesis: 'Pebble size decreases with distance downstream along a river.'
+
+The student plans to collect pebbles at five sites, each 50 m apart along a straight stretch of a river channel. At each site they will measure the intermediate (middle) axis of ten pebbles selected randomly using a random number table.`,
+      question: "Assess the suitability of the student's fieldwork method for testing the hypothesis. Refer to the advantages and limitations of the method, and suggest one improvement. [6 marks]",
+      hint: "Structure your answer: start by explaining why the method is suitable (links hypothesis to measurable data), then give specific limitations (sample size, random vs systematic sampling, one stretch of river vs the full long profile), and end with a clear improvement with a reason why it would strengthen the investigation.",
+      starter: "The student's method is suitable because measuring the intermediate axis...\nHowever, a limitation is...\nA further limitation is...\nOne improvement would be to...\nThis would strengthen the investigation because...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 6 marks (AO1 + AO2 + AO3)</h5>
+<p>Level 3 (5–6 marks): Balanced assessment of advantages and limitations with a well-justified improvement. Engages with the hypothesis directly and uses geographical terminology accurately throughout.</p>
+<p>Level 2 (3–4 marks): Identifies advantages and limitations but development is uneven. Improvement suggested but not fully justified.</p>
+<p>Level 1 (1–2 marks): Basic points about the method with little development. Improvement is vague or absent.</p>
+<p><strong>Acceptable content:</strong></p>
+<ul>
+  <li><strong>Advantages:</strong> Measuring the intermediate axis is a standard, repeatable method; ten pebbles per site gives a reasonable sample; using a random number table reduces sampling bias; five sites allow a trend to be identified; 50 m intervals are systematic.</li>
+  <li><strong>Limitations:</strong> Only ten pebbles per site — a larger sample (e.g. 20–30) would be more representative; sites are only 50 m apart on one short stretch — doesn't test the hypothesis across the full long profile; the student doesn't state how pebbles are located before measuring — if they choose the most visible ones, this introduces bias; weather and river conditions on one day may not be representative.</li>
+  <li><strong>Improvement:</strong> Increase pebble sample to 20+ per site; extend sites to cover the upper, middle and lower course; use a stratified random sampling strategy; replicate on multiple days.</li>
+</ul>
+<p><strong>Examiner's Comment:</strong> The most common error is listing advantages without genuine assessment, or suggesting improvements without explaining why they make the method more reliable or valid. The word 'assess' requires explicit judgement about how well the method tests the hypothesis.</p>
+</div>`,
+      modelAnswer: "The student's method is largely suitable for testing the hypothesis. Measuring the intermediate axis is the accepted standard technique in river pebble studies because it gives a consistent, reproducible measurement of pebble size. Taking ten readings per site and using a random number table to select pebbles reduces the risk of the student unconsciously choosing the largest or most interesting pebbles, which would bias the results. Having five sites at regular 50 m intervals creates a systematic transect that allows a clear trend to be identified across distance.\n\nHowever, there are important limitations. Ten pebbles per site is a relatively small sample — natural variation within a site means ten pebbles may not fully represent the range of sizes present, and one anomalously large or small pebble could distort the mean significantly. Additionally, five sites only 50 m apart on a single short reach of the river does not test change along the full long profile of the river (from source to mouth), where the hypothesis predicts the strongest pebble-size decrease. The results may therefore reflect only local variation rather than the large-scale downstream trend the hypothesis is concerned with.\n\nOne improvement would be to extend the study to cover sites in the upper, middle and lower course of the river, spacing them several kilometres apart. This would provide a much more representative test of downstream change and would make any trend (or absence of trend) in pebble size far more meaningful and credible."
+    }
+  ];
+</script>
+
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT ENGINE
+     ══════════════════════════════════════ -->
+<script src="script.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="badge">OCR GCSE Art &amp; Design — Printmaking</div>
+    <h1>Printmaking Techniques</h1>
+    <p>Interactive revision guide · Silkscreen, Block, Monoprinting &amp; Etching</p>
+  </div>
+  <a href="index.html" class="home-link">← 🏡 Home</a>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" onclick="switchTab('learn',this)">📚 Key Learning</button>
+  <button class="tab-btn" onclick="switchTab('mcq',this)">❓ MCQ Quiz</button>
+  <button class="tab-btn" onclick="switchTab('matching',this)">🔗 Matching</button>
+  <button class="tab-btn" onclick="switchTab('fib',this)">✏️ Fill the Blanks</button>
+  <button class="tab-btn" onclick="switchTab('misconceptions',this)">⚠️ Misconceptions</button>
+  <button class="tab-btn" onclick="switchTab('examtips',this)">🎯 Exam Tips</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('truefalse',this)">✅ True / False</button>
+  <button class="tab-btn" onclick="switchTab('exampractice',this)">📝 Exam Practice</button>
+</nav>
+
+<main>
+  <!-- KEY LEARNING -->
+  <div class="tab-panel active" id="tab-learn">
+    <h2 class="section-title">Key Learning Topics</h2>
+    <p class="section-sub">Double-click any card to expand detailed notes.</p>
+    <div class="topic-grid" id="topicGrid"></div>
+  </div>
+  <!-- MCQ -->
+  <div class="tab-panel" id="tab-mcq">
+    <h2 class="section-title">Multiple Choice Questions</h2>
+    <p class="section-sub">Select an answer to reveal instant feedback.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="mcqScore">0</div><div style="font-size:12px;color:var(--mid)">correct answers</div></div>
+      <div style="font-size:13px;color:var(--mid)">out of <strong id="mcqTotal">0</strong> attempted</div>
+      <button class="reset-btn" onclick="resetMCQ()">RESET</button>
+    </div>
+    <div class="quiz-wrap" id="mcqWrap"></div>
+  </div>
+  <!-- MATCHING -->
+  <div class="tab-panel" id="tab-matching">
+    <h2 class="section-title">Matching Activity</h2>
+    <p class="section-sub">Click a term on the left, then click the matching definition on the right.</p>
+    <div style="margin-bottom:16px">
+      <div class="score-bar">
+        <div><div class="score-num" id="matchScore">0</div><div style="font-size:12px;color:var(--mid)">matched</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="matchTotal">0</strong></div>
+        <button class="reset-btn" onclick="resetMatch()">RESET</button>
+      </div>
+    </div>
+    <div class="match-grid">
+      <div><div class="match-label">TERMS</div><div class="match-col" id="matchLeft"></div></div>
+      <div><div class="match-label">DEFINITIONS</div><div class="match-col" id="matchRight"></div></div>
+    </div>
+  </div>
+  <!-- FIB -->
+  <div class="tab-panel" id="tab-fib">
+    <h2 class="section-title">Fill in the Blanks</h2>
+    <p class="section-sub">Click each dropdown and choose the correct word. Wrong answers reset — try again!</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="fibScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="fibTotal">0</strong> blanks</div>
+      <button class="reset-btn" onclick="resetFIB()">RESET</button>
+    </div>
+    <div class="fib-wrap" id="fibWrap"></div>
+  </div>
+  <!-- MISCONCEPTIONS -->
+  <div class="tab-panel" id="tab-misconceptions">
+    <h2 class="section-title">Common Misconceptions</h2>
+    <p class="section-sub">What students often think — and what examiners actually want.</p>
+    <div class="misc-list" id="miscList"></div>
+  </div>
+  <!-- EXAM TIPS -->
+  <div class="tab-panel" id="tab-examtips">
+    <h2 class="section-title">Exam Questions &amp; Tips</h2>
+    <p class="section-sub">Most repeated question types and mark-scheme structures from real OCR papers.</p>
+    <div class="tips-grid" id="tipsGrid"></div>
+  </div>
+  <!-- FLASHCARDS -->
+  <div class="tab-panel" id="tab-flashcards">
+    <h2 class="section-title">Flashcards</h2>
+    <p class="section-sub">Test yourself! Flip the card and rate your knowledge. Review your weak areas at the end.</p>
+    <div class="fc-container">
+      <div class="score-bar" id="fcScoreBar" style="display:none;margin-bottom:20px">
+        <div><div class="score-num" id="fcKnown" style="color:#2d7a4f">0</div><div style="font-size:12px;color:var(--mid)">known</div></div>
+        <div><div class="score-num" id="fcUnknown" style="color:#c84b31">0</div><div style="font-size:12px;color:var(--mid)">learning</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="fcTotalTrack">0</strong></div>
+        <button class="reset-btn" onclick="resetFlashcards()">RESET</button>
+      </div>
+      <div id="fcActiveArea">
+        <div class="fc-progress" id="fcProgress">Card 1 of 0</div>
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="fc-inner">
+            <div class="fc-front"><div class="fc-label">KEY TERM</div><div class="fc-term" id="fcTerm"></div></div>
+            <div class="fc-back"><div class="fc-def" id="fcDef"></div></div>
+          </div>
+        </div>
+        <p class="fc-hint">👆 Click card to flip</p>
+        <div class="fc-nav" id="fcNavDefault">
+          <button class="fc-btn outline" onclick="prevCard()">← Prev</button>
+          <button class="fc-btn outline" onclick="flipCard()">Flip</button>
+          <button class="fc-btn" onclick="nextCard()">Next →</button>
+        </div>
+        <div class="fc-nav" id="fcNavAssess" style="display:none;gap:15px">
+          <button class="fc-btn outline" style="border-color:#c84b31;color:#c84b31;flex:1" onclick="markCard(false)">❌ Still Learning</button>
+          <button class="fc-btn" style="background:#2d7a4f;border-color:#2d7a4f;flex:1" onclick="markCard(true)">✅ Got It</button>
+        </div>
+      </div>
+      <div id="fcSummaryArea" style="display:none;text-align:center;padding:40px 20px">
+        <h3>Session Complete! 🎉</h3>
+        <p style="margin:15px 0">You knew <strong id="fcSummaryKnown">0</strong> out of <strong id="fcSummaryTotal">0</strong> cards.</p>
+        <div style="margin-top:25px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap">
+          <button class="fc-btn" id="btnReviewWrong" onclick="reviewWrong()" style="background:#c84b31;border-color:#c84b31">Review Incorrect</button>
+          <button class="fc-btn outline" onclick="resetFlashcards()">Practice All Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- TRUE / FALSE -->
+  <div class="tab-panel" id="tab-truefalse">
+    <h2 class="section-title">True or False?</h2>
+    <p class="section-sub">Test your knowledge with these statements.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="tfScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="tfTotal">0</strong> answered</div>
+      <button class="reset-btn" onclick="resetTF()">RESET</button>
+    </div>
+    <div class="tf-wrap" id="tfWrap"></div>
+  </div>
+  <!-- EXAM PRACTICE -->
+  <div class="tab-panel" id="tab-exampractice">
+    <h2 class="section-title">Exam Practice Questions</h2>
+    <p class="section-sub">Full exam questions with case studies. Use <strong>Hint</strong>, <strong>Sentence Starter</strong> and <strong>Submit &amp; See Mark Scheme</strong> for each question.</p>
+    <div class="ep-list" id="epList"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════
+     DATA ARRAYS
+     ══════════════════════════════════════ -->
+<script>
+
+  /* ══════════════════════════════════════════════
+     PAGE METADATA — update this for each topic
+  ══════════════════════════════════════════════ */
+
+  const pageMeta = {
+    badge: "AQA GCSE Geography · Paper 3 — Section B",
+    title: "Fieldwork",
+    subtitle: "Interactive revision guide · Data Collection, Presentation, Analysis &amp; Evaluation"
+  };
+
+  /* ── Apply metadata on load ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    const badgeEl = document.querySelector('.badge');
+    const h1El = document.querySelector('header h1');
+    const subEl = document.querySelector('header p');
+    const titleEl = document.querySelector('title');
+
+    if (badgeEl) badgeEl.innerHTML = pageMeta.badge;
+    if (h1El) h1El.textContent = pageMeta.title;
+    if (subEl) subEl.textContent = pageMeta.subtitle;
+    if (titleEl) titleEl.textContent = pageMeta.title.replace(/&amp;/g, '&');
+  });
+
+  /* ══════════════════════════════════════════════
+     ARRAY 1: topics  (7 entries)
+  ══════════════════════════════════════════════ */
+
+  const topics = [
+    {
+      title: "Aims, Hypotheses & Underpinning Geographical Theory",
+      tag: "Core Concept",
+      content: `<p>All fieldwork begins with a clear aim and a testable hypothesis, both linked to established geographical theory.</p>
+<ul>
+  <li><strong>Aim:</strong> Explains what the enquiry is attempting to achieve — e.g. "An investigation into changes in beach profiles along Mappleton Beach."</li>
+  <li><strong>Hypothesis:</strong> A clear, <em>directional</em> and <em>measurable</em> statement that can be tested — e.g. "River discharge increases with distance from the source of the River Dove."</li>
+  <li><strong>Underpinning theory:</strong> Fieldwork must link to established theories, models or concepts already studied in class. The fieldwork does not have to be based on the theory, but the link must be identifiable.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Example: Bradshaw's Model (River Fieldwork)</h4>
+  <p>Bradshaw's Model predicts how river characteristics change from source to mouth: discharge, occupied channel width, channel depth and average velocity all <strong>increase</strong> downstream, while load particle size, channel bed roughness and slope gradient (angle) all <strong>decrease</strong>. Students use this model to formulate a testable hypothesis — e.g. "Pebble size decreases with distance from the source" — which is then investigated through fieldwork.</p>
+</div>`
+    },
+    {
+      title: "Primary & Secondary Data",
+      tag: "Data Collection",
+      content: `<p>All data used in a fieldwork enquiry is classified as either primary or secondary, each with distinct strengths and limitations.</p>
+<ul>
+  <li><strong>Primary data:</strong> Collected first-hand by YOU during YOUR enquiry — questionnaires, river velocity measurements, pebble counts, photographs, traffic counts, environmental quality surveys.</li>
+  <li><strong>Secondary data:</strong> Collected by someone else and used by the student — census results, weather records, old photographs, maps, newspaper articles, websites.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">Primary Data</div>
+    <div class="pro-item">Specific to the enquiry question</div>
+    <div class="pro-item">Up to date and collected by a known method</div>
+    <div class="pro-item">You control how much data is collected</div>
+    <div class="con-item">Time-consuming to collect</div>
+    <div class="con-item">May require specialist equipment</div>
+    <div class="con-item">Sample size must be large to be accurate</div>
+  </div>
+  <div>
+    <div class="col-head">Secondary Data</div>
+    <div class="pro-item">Easy to access — often free</div>
+    <div class="pro-item">Large amounts of data available quickly</div>
+    <div class="pro-item">Can cover long time periods</div>
+    <div class="con-item">Not specific to your enquiry</div>
+    <div class="con-item">No control over data quality or bias</div>
+    <div class="con-item">May be out of date</div>
+  </div>
+</div>`
+    },
+    {
+      title: "Sampling Methods",
+      tag: "Data Collection",
+      content: `<p>Sampling is used because it is not possible to measure an entire study area. A good sample must be representative and statistically valid.</p>
+<ul>
+  <li><strong>Random sampling:</strong> A grid is placed over the study area; squares are numbered and selected using a random number generator. Samples are collected as close as possible to the chosen points. <em>Least biased method</em>, but may miss important areas by chance.</li>
+  <li><strong>Systematic sampling:</strong> Data is collected at regular intervals — e.g. every 100m along a river transect, or every 10th person in a questionnaire. Easy and quick, but not all sites have an equal chance of selection, which can introduce bias.</li>
+  <li><strong>Stratified sampling:</strong> The sample reflects known proportions in the population. If 10% of the study area's visitors are over 65, then 10% of questionnaire respondents should be over 65. Can be used alongside random or systematic sampling.</li>
+</ul>
+<div class="case-study-box">
+  <h4>Which sampling method to use?</h4>
+  <p>For a river pebble study, <strong>systematic sampling</strong> at sites every 200m along the river is most common. For a town centre questionnaire where specific age groups must be represented, use <strong>stratified sampling</strong>. For a vegetation study on a hillside where all areas are equally valid, <strong>random sampling</strong> using a grid avoids selection bias.</p>
+</div>`
+    },
+    {
+      title: "Quantitative & Qualitative Data",
+      tag: "Data Types",
+      content: `<p>Understanding the difference between data types is essential for choosing the right collection method and presentation technique.</p>
+<ul>
+  <li><strong>Quantitative data:</strong> Records quantities as numbers — e.g. river velocity (0.34 m/s), pebble size (14mm), traffic counts (87 vehicles/hour), environmental quality scores (+2).</li>
+  <li><strong>Qualitative data:</strong> Records descriptive information — e.g. annotated field sketches, photographs, open-ended interview answers, written observations.</li>
+</ul>
+<div class="two-col">
+  <div>
+    <div class="col-head">Quantitative</div>
+    <div class="pro-item">Larger sample sizes possible</div>
+    <div class="pro-item">More objective and reliable</div>
+    <div class="pro-item">Easy to compare statistically across sites</div>
+    <div class="con-item">The meaning or reason behind results is not always clear</div>
+    <div class="con-item">Human or equipment error can distort measurements</div>
+  </div>
+  <div>
+    <div class="col-head">Qualitative</div>
+    <div class="pro-item">More in-depth — captures nuance and context</div>
+    <div class="pro-item">More valid — reflects real experience</div>
+    <div class="con-item">Often a small sample size</div>
+    <div class="con-item">Difficult to compare across sites or replicate</div>
+    <div class="con-item">Time-consuming; low reliability</div>
+  </div>
+</div>
+<p>An <strong>Environmental Quality Survey (EQS)</strong> is a key hybrid tool: it uses personal judgement (making it <em>subjective</em>), but records scores on a numerical bipolar scale (e.g. -2 to +2), so it produces <em>quantitative</em> data. Subjectivity can be reduced by completing the survey in small groups to reach a consensus.</p>`
+    },
+    {
+      title: "Data Presentation Methods",
+      tag: "Data Presentation",
+      content: `<p>The presentation method must match the data type and what you are trying to show. The exam will ask you to choose an appropriate technique and justify it.</p>
+<ul>
+  <li><strong>Bar graph:</strong> Discrete data; best for comparing groups or changes over time — e.g. pedestrian counts at six sites.</li>
+  <li><strong>Line graph:</strong> Continuous data; shows change over time or distance — e.g. temperature changes across a city, river cross-section profiles.</li>
+  <li><strong>Scatter graph:</strong> Shows the relationship (correlation) between two variables. Do NOT join points. Add a <strong>line of best fit</strong> — a straight line with roughly equal numbers of points on each side.</li>
+  <li><strong>Pie chart:</strong> Shows proportions of a whole; data must be in percentages totalling 100%.</li>
+  <li><strong>Choropleth map:</strong> Areas shaded to show variation in values across zones — e.g. house prices by area, population density.</li>
+  <li><strong>Proportional symbols map:</strong> Circles or squares drawn in proportion to the value — e.g. visitor numbers, traffic flow.</li>
+  <li><strong>Isoline map:</strong> Lines connect points of equal value — e.g. temperature isolines, contour lines. Lines must not touch or cross each other.</li>
+</ul>
+<div class="formula-box">
+  Choosing the right technique:<br>
+  Discrete data → Bar graph &nbsp;|&nbsp; Continuous → Line graph &nbsp;|&nbsp; Two variables → Scatter graph<br>
+  Proportions → Pie chart &nbsp;|&nbsp; Spatial variation → Choropleth &nbsp;|&nbsp; Equal values → Isoline map
+</div>`
+    },
+    {
+      title: "Statistical Analysis & Anomalies",
+      tag: "Data Analysis",
+      content: `<p>Once data is collected and presented, statistical methods are used to identify patterns, trends and relationships.</p>
+<ul>
+  <li><strong>Mean:</strong> Add all values and divide by the number of values. Most affected by extreme values (anomalies).</li>
+  <li><strong>Median:</strong> The middle value when data is in rank order. Less affected by anomalies than the mean — preferred for skewed data sets.</li>
+  <li><strong>Mode:</strong> The most frequently occurring value in a data set.</li>
+  <li><strong>Range:</strong> Highest value minus lowest value — a basic measure of dispersion (spread).</li>
+  <li><strong>Interquartile range (IQR):</strong> The range of the middle 50% of data — more reliable than the full range as it excludes extreme values.</li>
+  <li><strong>Anomalies:</strong> Results that do not fit the overall pattern or trend. They must be <em>identified</em>, <em>described</em> and <em>explained</em> — never simply ignored or removed from the data set.</li>
+</ul>
+<div class="formula-box">
+  Mean = Sum of all values ÷ Number of values<br>
+  Range = Highest value − Lowest value<br>
+  Median = Middle value (rank the data in order first; if even number of values, average the two middle values)
+</div>
+<div class="case-study-box">
+  <h4>Example: Pebble size study, River Colne</h4>
+  <p>Median pebble sizes were 16.5mm (Site A, upstream), 10.5mm (Site B, mid-point) and 9.5mm (Site C, downstream). This broadly supports the hypothesis. However, one pebble at Site B measured 61mm — an anomaly possibly caused by a large block recently eroded from the bank, not yet reduced by attrition. This weakens the strength of the correlation.</p>
+</div>`
+    },
+    {
+      title: "Conclusion & Evaluation",
+      tag: "Evaluation",
+      content: `<p>The final stage of any fieldwork enquiry requires drawing a conclusion and critically evaluating the entire investigation.</p>
+<p><strong>The conclusion should:</strong></p>
+<ul>
+  <li>Return explicitly to the hypothesis and aim</li>
+  <li>Identify evidence that supports the hypothesis (with specific data)</li>
+  <li>Identify evidence that contradicts or weakens it (anomalies, exceptions)</li>
+  <li>Link findings to geographical theory (e.g. Bradshaw's Model, distance-decay)</li>
+  <li>State clearly whether the hypothesis is supported, partially supported or not supported</li>
+</ul>
+<p><strong>The evaluation should consider:</strong></p>
+<ul>
+  <li>Was the sample size large enough to be representative?</li>
+  <li>Were all sites accessible and safe?</li>
+  <li>Did weather, time of day or day of week affect results?</li>
+  <li>Were questionnaire questions appropriate and unambiguous?</li>
+  <li>Could more accurate equipment have been used (e.g. flow meter vs. float)?</li>
+  <li>How could the scope of the enquiry be extended to improve conclusions?</li>
+</ul>
+<div class="case-study-box">
+  <h4>Strong evaluation example — pedestrian footfall study</h4>
+  <p>Conducting pedestrian counts at multiple times of day (e.g. 9am, 12pm and 4pm) and averaging them would improve reliability, as footfall varies with school hours, lunch breaks and shopping habits. Using two counters simultaneously at each site would also reduce human error in tallying. Surveying on both a weekday and a Saturday would reveal whether the pattern holds across different types of shopping day.</p>
+</div>`
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 2: mcqData  (12 entries)
+  ══════════════════════════════════════════════ */
+
+  const mcqData = [
+    {
+      q: "Which of the following is an example of primary data in a geographical fieldwork enquiry?",
+      opts: [
+        "Census population statistics from the Office for National Statistics",
+        "River velocity measured by students using a float method",
+        "Historical flood records from the Environment Agency",
+        "Old newspaper articles about coastal erosion"
+      ],
+      ans: 1,
+      explain: "Correct: B. Primary data is collected first-hand by the student during the enquiry. A, C and D are all secondary data — collected by someone else and used by the student. The key distinction is who collected it and when."
+    },
+    {
+      q: "A student surveys every 10th person who walks past a fixed point on a high street. Which sampling method is this?",
+      opts: [
+        "Random sampling",
+        "Stratified sampling",
+        "Systematic sampling",
+        "Opportunistic sampling"
+      ],
+      ans: 2,
+      explain: "Correct: C. Systematic sampling selects data at regular intervals — here, every 10th person. Random sampling uses a random number generator. Stratified sampling reflects known proportions within a population. Opportunistic sampling is not a formal AQA sampling strategy."
+    },
+    {
+      q: "Which graph type is most appropriate to show the relationship between river width and river depth at different sites?",
+      opts: [
+        "Bar graph",
+        "Pie chart",
+        "Scatter graph",
+        "Choropleth map"
+      ],
+      ans: 2,
+      explain: "Correct: C. A scatter graph plots two variables against each other and uses a line of best fit to show any correlation. Bar graphs compare discrete groups; pie charts show proportions; choropleth maps show spatial variation — none of these shows a relationship between two continuous variables."
+    },
+    {
+      q: "A set of pebble sizes in mm is: 4, 6, 8, 9, 11, 12, 14, 19, 20. What is the median value?",
+      opts: [
+        "10.3mm",
+        "9mm",
+        "9.5mm",
+        "11mm"
+      ],
+      ans: 3,
+      explain: "Correct: D. The median is the middle value of a ranked data set. With 9 values, the 5th is the median: 4, 6, 8, 9, [11], 12, 14, 19, 20 — giving 11mm. A (10.3) is approximately the mean. B (9) is the 4th value. C (9.5) would be the mean of the 4th and 5th values, used only when there is an even number of values."
+    },
+    {
+      q: "Which of the following is a limitation of an Environmental Quality Survey (EQS)?",
+      opts: [
+        "It produces qualitative data that cannot be compared statistically",
+        "It is too time-consuming to use at more than one site",
+        "It is subjective, as scores depend on the opinion of the individual completing it",
+        "It can only be used in urban environments"
+      ],
+      ans: 2,
+      explain: "Correct: C. The EQS is subjective because assessments rely on personal opinion, meaning different students may score the same site differently. In fact, it produces quantitative (numerical) data, can be completed quickly, and is used in both urban and rural environments."
+    },
+    {
+      q: "Which map type uses shading to show variation in a value across different areas, such as average house prices by neighbourhood?",
+      opts: [
+        "Flow line map",
+        "Dot map",
+        "Choropleth map",
+        "Desire line map"
+      ],
+      ans: 2,
+      explain: "Correct: C. A choropleth map uses shading from a pre-arranged key to show how a value varies across different zones. Flow line and desire line maps show movement of people or goods. A dot map uses dots to show distribution, with each dot representing a set quantity."
+    },
+    {
+      q: "A student's river pebble data shows a general decrease in size downstream, but one pebble at Site 3 is far larger than the rest. What should the student do?",
+      opts: [
+        "Remove it from the data set so it does not skew the mean",
+        "Re-measure the pebble, as it was probably recorded incorrectly",
+        "Identify it as an anomaly, describe it and offer a geographical explanation",
+        "Reject the hypothesis, as the data does not support it"
+      ],
+      ans: 2,
+      explain: "Correct: C. Anomalies should never simply be removed or used to reject the hypothesis. They must be identified, described and explained — for example, 'This pebble may have been recently deposited by a tributary and not yet reduced by attrition.' Removing anomalies without reason is poor scientific practice and will lose marks."
+    },
+    {
+      q: "What is the purpose of conducting a pilot study before the main data collection?",
+      opts: [
+        "To write up the final report before going into the field",
+        "To test and refine data collection methods and identify any problems",
+        "To collect all the data needed for the conclusion",
+        "To choose the best hypothesis from several alternatives"
+      ],
+      ans: 1,
+      explain: "Correct: B. A pilot study is a trial run carried out before the main data collection. It identifies problems with equipment, questionnaire wording, timing and site selection, allowing improvements before the full enquiry begins. This increases the reliability and validity of the final data."
+    },
+    {
+      q: "Which of the following would best improve the reliability of a pedestrian footfall survey?",
+      opts: [
+        "Conducting the count on a single weekday morning only",
+        "Conducting counts at multiple times of day and calculating a mean",
+        "Moving all survey sites closer to the town centre",
+        "Recording data from memory at the end of the day"
+      ],
+      ans: 1,
+      explain: "Correct: B. Conducting counts at multiple times of day (e.g. 9am, 12pm and 4pm) and calculating a mean improves reliability because footfall varies throughout the day due to school hours, lunch breaks and shopping habits. The other options would reduce the reliability or representativeness of the data."
+    },
+    {
+      q: "What does the 'range' of a data set measure?",
+      opts: [
+        "The most frequently occurring value",
+        "The middle value when data is in rank order",
+        "The distance between the highest and lowest values",
+        "The average of all values in the data set"
+      ],
+      ans: 2,
+      explain: "Correct: C. The range is a measure of dispersion — it shows the spread of data from the highest to the lowest value. The mode is the most frequent value; the median is the middle value; and the mean is the average. The range is easy to calculate but is sensitive to anomalies."
+    },
+    {
+      q: "A student conducting a river velocity study uses a float method. What is the key limitation of this technique compared to using a flow meter?",
+      opts: [
+        "The float method takes too long to repeat at multiple sites",
+        "The float only measures surface velocity, not the mean velocity of the whole water column",
+        "Floats cannot be used in rivers shallower than 1 metre",
+        "The float method gives readings in the wrong units"
+      ],
+      ans: 1,
+      explain: "Correct: B. The float (cork) travels on the water surface and only measures surface velocity. Mean velocity across the whole water column is lower due to friction with the riverbed. A flow meter placed at depth gives a more accurate reading of true mean velocity, improving the validity of comparisons between sites."
+    },
+    {
+      q: "What type of correlation does a scatter graph show when the line of best fit slopes downward from left to right?",
+      opts: [
+        "Positive correlation",
+        "No correlation",
+        "Negative correlation",
+        "Perfect correlation"
+      ],
+      ans: 2,
+      explain: "Correct: C. A negative correlation means that as one variable increases, the other decreases — shown by a line of best fit sloping downward from left to right. A positive correlation slopes upward (both variables increase together). No correlation means the points are scattered with no clear pattern. Perfect correlation would show all points exactly on the line."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 3: matchData  (15 pairs)
+  ══════════════════════════════════════════════ */
+
+  const matchData = [
+    { term: "Hypothesis", def: "A clear, directional and measurable statement that can be tested through fieldwork data collection." },
+    { term: "Primary data", def: "Data collected first-hand by the student during their own enquiry, e.g. river velocity measurements or questionnaires." },
+    { term: "Secondary data", def: "Data collected by someone else and used by the student, e.g. census statistics, weather records or old maps." },
+    { term: "Random sampling", def: "A method where every location or individual has an equal chance of selection, using a random number generator and a grid." },
+    { term: "Systematic sampling", def: "A method where data is collected at regular, fixed intervals, such as every 100m along a river or every 10th pedestrian." },
+    { term: "Stratified sampling", def: "A method where the sample reflects the known proportional make-up of the population being studied." },
+    { term: "Quantitative data", def: "Numerical data that can be measured and analysed statistically, such as pebble size in mm or pedestrian counts." },
+    { term: "Environmental Quality Survey", def: "A technique using a bipolar numerical scale to score environmental conditions at a site; produces quantitative but subjective data." },
+    { term: "Choropleth map", def: "A map where different areas are shaded to show variation in a value, such as population density or average income." },
+    { term: "Scatter graph", def: "A graph plotting two variables to show their relationship; points are never joined, and a line of best fit is drawn." },
+    { term: "Anomaly", def: "A result that does not fit the general pattern or trend; must be identified, described and given a geographical explanation." },
+    { term: "Median", def: "The middle value of a data set arranged in rank order; less affected by extreme values than the mean." },
+    { term: "Range", def: "The difference between the highest and lowest values in a data set; a simple measure of dispersion." },
+    { term: "Pilot study", def: "A trial run of data collection methods before the main enquiry, used to identify problems and improve the approach." },
+    { term: "Bradshaw's Model", def: "A geographical model showing that discharge, width, depth and velocity all increase from a river's source to its mouth." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 4: fibData  (11 entries)
+     ARRAY 5: fibWords
+  ══════════════════════════════════════════════ */
+
+  const fibData = [
+    {
+      display: "The _____ explains what the enquiry is trying to achieve, while the _____ is a specific, directional statement that can be tested.",
+      blanks: { B1: "aim", B2: "hypothesis" }
+    },
+    {
+      display: "Data collected first-hand by a student is called _____ data, while data gathered by someone else is called _____ data.",
+      blanks: { B1: "primary", B2: "secondary" }
+    },
+    {
+      display: "In _____ sampling, every site has an equal chance of selection. In _____ sampling, data is collected at fixed regular intervals.",
+      blanks: { B1: "random", B2: "systematic" }
+    },
+    {
+      display: "An EQS produces _____ data because results are recorded as numbers on a scale, but it is _____ because it relies on personal judgement.",
+      blanks: { B1: "quantitative", B2: "subjective" }
+    },
+    {
+      display: "A _____ graph is used to show the relationship between two variables. A line of _____ is drawn to show the overall trend without connecting individual points.",
+      blanks: { B1: "scatter", B2: "best fit" }
+    },
+    {
+      display: "The _____ is found by adding all values and dividing by their count, while the _____ is the middle value when data is placed in rank order.",
+      blanks: { B1: "mean", B2: "median" }
+    },
+    {
+      display: "A _____ map uses shading to show variation across areas, while a _____ symbols map draws shapes proportional to the data value they represent.",
+      blanks: { B1: "choropleth", B2: "proportional" }
+    },
+    {
+      display: "Results that do not fit the overall pattern are called _____, and should always be _____ and explained rather than removed.",
+      blanks: { B1: "anomalies", B2: "identified" }
+    },
+    {
+      display: "The fieldwork _____ should return to the hypothesis and state whether the data supports it. The _____ should identify limitations and suggest improvements.",
+      blanks: { B1: "conclusion", B2: "evaluation" }
+    },
+    {
+      display: "The _____ of a data set is the highest value minus the lowest value, and is a measure of _____.",
+      blanks: { B1: "range", B2: "dispersion" }
+    },
+    {
+      display: "Bradshaw's Model predicts that as you travel downstream, river _____ increases while load particle _____ decreases.",
+      blanks: { B1: "discharge", B2: "size" }
+    }
+  ];
+
+  const fibWords = [
+    "aim", "hypothesis", "primary", "secondary", "random", "systematic",
+    "stratified", "quantitative", "qualitative", "subjective", "objective",
+    "scatter", "best fit", "mean", "median", "mode", "choropleth", "proportional",
+    "anomalies", "identified", "conclusion", "evaluation", "range", "dispersion",
+    "discharge", "size", "velocity", "width", "depth", "reliability", "validity",
+    "gradient", "isoline", "transect", "sample"
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 6: tfData  (10 entries)
+  ══════════════════════════════════════════════ */
+
+  const tfData = [
+    {
+      statement: "A hypothesis must be a directional and measurable statement that can be tested through fieldwork data.",
+      answer: true,
+      explanation: "TRUE. A hypothesis is not just a topic or a question — it predicts a relationship between variables in a measurable way. For example, 'Pebble size decreases with distance downstream' is a valid hypothesis because it has a clear direction and can be tested by measuring pebble sizes at different sites."
+    },
+    {
+      statement: "Secondary data is always more reliable than primary data because it has been collected and published by experts.",
+      answer: false,
+      explanation: "FALSE. Secondary data has significant limitations: it may be out of date, biased, or not specific to the enquiry. Primary data collected by the student is more relevant to the enquiry question and uses a known method. Neither type is automatically more reliable — both have strengths and limitations that must be evaluated."
+    },
+    {
+      statement: "In systematic sampling, every site in the study area has an equal chance of being selected.",
+      answer: false,
+      explanation: "FALSE. It is random sampling that gives every site an equal chance of selection. In systematic sampling, sites are chosen at regular intervals (e.g. every 100m), so the starting point and interval determine which sites are selected. This makes systematic sampling more predictable but potentially biased if the pattern matches a feature in the landscape."
+    },
+    {
+      statement: "An Environmental Quality Survey (EQS) produces qualitative data because assessments are based on personal judgement.",
+      answer: false,
+      explanation: "FALSE. Despite being subjective (relying on personal opinion), an EQS produces quantitative data because the judgements are recorded as numbers on a bipolar or sliding scale. This allows statistical comparison between sites. Subjectivity is a limitation, but the data type is quantitative, not qualitative."
+    },
+    {
+      statement: "On a scatter graph, the data points should be joined by a line to show the trend between the two variables.",
+      answer: false,
+      explanation: "FALSE. The points on a scatter graph must never be joined. Joining them creates a line graph, which implies a continuous link between every sequential data point. Instead, a single straight line of best fit is drawn to show the overall trend, with roughly equal numbers of data points on each side of the line."
+    },
+    {
+      statement: "The median is less affected by anomalous results than the mean.",
+      answer: true,
+      explanation: "TRUE. The median is the middle value of a ranked data set and is not calculated using all values, so extreme anomalies do not distort it. The mean, by contrast, includes every value in its calculation, so a single very large or small anomaly can significantly change the average, making it less representative of the typical result."
+    },
+    {
+      statement: "A pilot study is carried out after the main data collection to check the results are accurate.",
+      answer: false,
+      explanation: "FALSE. A pilot study is conducted before the main data collection — it is a trial run. Its purpose is to test equipment, questionnaire questions and site selection in advance, so that any problems can be identified and corrected before the full enquiry begins. This improves the reliability and validity of the final data set."
+    },
+    {
+      statement: "Anomalies in fieldwork data should be identified and explained, not simply removed from the data set.",
+      answer: true,
+      explanation: "TRUE. Anomalies must be acknowledged in the analysis and given a geographical explanation — for example, a large pebble at a downstream site may have been deposited by a tributary rather than transported from upstream. Removing anomalies without justification is poor practice and will not gain marks in an exam evaluation question."
+    },
+    {
+      statement: "Stratified sampling ensures that every location or individual in the study area has an equal chance of being selected.",
+      answer: false,
+      explanation: "FALSE. This describes random sampling. Stratified sampling divides the population into sub-groups and ensures the sample reflects the proportional make-up of those groups. For example, if 40% of town centre visitors are aged 18–30, then 40% of questionnaire respondents should be from that age group. It does not give every individual an equal chance of selection."
+    },
+    {
+      statement: "A choropleth map is an appropriate way to show the distribution of house prices across different areas of a town.",
+      answer: true,
+      explanation: "TRUE. A choropleth map uses different shading patterns or colour intensities to show variation in a value across different zones. Since house prices can be grouped into ranges (e.g. under £150,000; £150,000–£200,000; over £200,000) and each area can be shaded accordingly, this is an appropriate presentation technique for this type of spatial data."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 7: miscData  (7 entries)
+  ══════════════════════════════════════════════ */
+
+  const miscData = [
+    {
+      wrong: "Any data I collect in the field counts as primary data.",
+      correct: "Primary data is only data collected by YOU during YOUR specific enquiry. If you copy data from a fellow student's sheet, use historical results from a previous year's fieldwork, or take figures from a published source, that becomes secondary data. The key question is: did you personally collect it as part of this enquiry?"
+    },
+    {
+      wrong: "On a scatter graph, I should join the data points with a line to show the trend.",
+      correct: "Data points on a scatter graph must NEVER be joined. Connecting them creates a line graph, implying a continuous change between specific points. Instead, draw a single straight line of best fit that has roughly equal numbers of points above and below it, showing the overall correlation (positive, negative or none)."
+    },
+    {
+      wrong: "An EQS produces qualitative data because the scores are based on my personal opinion.",
+      correct: "Although an EQS is subjective (based on opinion), it produces quantitative data because scores are recorded as numbers on a scale (e.g. -2 to +2). The subjective nature is a limitation of the method — it can be reduced by working in groups to agree on a score or by using the mode of scores from multiple students at each site."
+    },
+    {
+      wrong: "If my results don't support my hypothesis, my fieldwork has failed.",
+      correct: "A conclusion that contradicts the hypothesis is just as geographically valid and just as creditworthy as one that confirms it. The key is whether you can explain why the hypothesis was or was not supported, using your data and linking to geographical theory. Examiners reward honest, well-evidenced evaluation — not a neatly confirmed hypothesis."
+    },
+    {
+      wrong: "Saying 'I would increase the sample size' is enough for a full-mark evaluation answer.",
+      correct: "Vague improvements gain only 1 mark. You must be specific: state HOW you would change the method (e.g. 'measure 30 pebbles at each site instead of 10, selected randomly'), WHY this addresses the problem (e.g. 'to reduce the influence of anomalous pebbles on the median'), and what IMPACT it would have (e.g. 'making the median more representative of the pebble population at each site')."
+    },
+    {
+      wrong: "Anomalies are results I can ignore because they ruin my pattern.",
+      correct: "Anomalies must be identified, described and explained in your analysis and conclusion — ignoring them loses marks. A good answer names the anomaly specifically (e.g. 'Site 2 had a mean footfall of 40, lower than the trend would predict'), offers a geographical reason (e.g. 'a nearby road closure may have redirected pedestrian traffic'), and explains its impact on the reliability of the conclusion."
+    },
+    {
+      wrong: "Writing 'the data supports my hypothesis' without quoting actual figures will gain full marks.",
+      correct: "Examiners require evidence from your data to back up any statement about whether the hypothesis is supported. Always quote specific figures: 'Mean pebble size decreased from 64mm at Site 1 to 23mm at Site 5, supporting the hypothesis that size decreases downstream.' A statement without data will gain a maximum of 1 mark, regardless of how well-written it is."
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 8: examTips  (5 entries)
+  ══════════════════════════════════════════════ */
+
+  const examTips = [
+    {
+      type: "Describe — 2 marks",
+      title: "Develop Your Description with Specific Data",
+      content: `<p>'Describe the pattern' questions reward you for identifying the overall trend AND developing it with specific data values or comparisons. One mark is for the trend; the second mark is for development (using data, showing rate of change, or noting exceptions).</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> State the overall pattern/trend clearly and directly.</li>
+  <li><strong>Step 2:</strong> Develop with a specific data value, comparison, or reference to the map/graph (e.g. name a region, quote a figure, note an exception).</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "Visitors mostly come from closer areas."</p>
+<p><strong>✅ Strong Answer:</strong> "Most visitors come from southern regions of the UK, particularly the South East and East Midlands. Fewer visitors travel from Scotland and Northern Ireland, suggesting a distance-decay effect."</p>
+<p><strong>Sentence Starter:</strong> "The pattern shows that... [trend]. This is particularly evident in... [specific data/location], while... [comparison or exception]."</p>`,
+      pills: ["K"]
+    },
+    {
+      type: "Suggest — 2 marks",
+      title: "Propose + Reason = 2 Marks",
+      content: `<p>'Suggest' questions always require both a proposal AND a linked justification. Each mark corresponds to one of these elements. If your suggestion is not linked to a reason, you will score a maximum of 1 mark.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> State a specific, actionable suggestion.</li>
+  <li><strong>Step 2:</strong> Explain WHY this would help — what information or improvement it provides.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "They could improve the survey by collecting more data."</p>
+<p><strong>✅ Strong Answer:</strong> "The survey could be carried out on both a weekday and a Saturday [suggestion], as footfall patterns are likely to differ between shopping days, making the results more representative of typical pedestrian activity [reason]."</p>
+<p><strong>Sentence Starter:</strong> "One improvement would be to... [specific change]. This would [improve reliability / provide more useful information] because..."</p>`,
+      pills: ["K", "app"]
+    },
+    {
+      type: "Justify — 3 marks",
+      title: "Link Your Method Directly to Your Enquiry",
+      content: `<p>'Justify' questions ask WHY a data collection method was used. You must link the method to the specific enquiry aim or hypothesis — not just describe what you did. Three marks require three distinct points: description, justification and development.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> Name and briefly describe the method.</li>
+  <li><strong>Step 2:</strong> Explain why it was appropriate for this specific enquiry (link to aim/hypothesis).</li>
+  <li><strong>Step 3:</strong> Develop — e.g. how it allowed comparison between sites, OR acknowledge a limitation and how it was managed.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "We used a questionnaire because it helped us find out information."</p>
+<p><strong>✅ Strong Answer:</strong> "We used a bipolar Environmental Quality Survey (EQS) at six sites along a transect, rating each site from -2 to +2 for ten indicators. This was appropriate because it produced a numerical score for each site, making it easy to compare environmental quality and test whether it changed with distance from the town centre. Completing the survey in groups of three to agree on scores reduced the subjectivity of individual judgements."</p>
+<p><strong>Sentence Starter:</strong> "We used [method] at [where/how many sites] because... This was appropriate for our enquiry because it allowed us to [link to hypothesis]. A limitation was [x], which we addressed by [y]."</p>`,
+      pills: ["K", "app", "an"]
+    },
+    {
+      type: "To what extent — 4 or 9 marks",
+      title: "Judge — Don't Just Describe the Data",
+      content: `<p>'To what extent' is an evaluation command. It requires a clear judgement about HOW WELL or HOW STRONGLY the data supports the hypothesis — not just a description of what the data shows. You must acknowledge limitations and anomalies, and reach an overall verdict.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> Open with your overall judgement (does the data fully, broadly, partially or not support the hypothesis?).</li>
+  <li><strong>Step 2:</strong> Support the judgement with specific data that backs the hypothesis.</li>
+  <li><strong>Step 3:</strong> Identify an anomaly or limitation that complicates or weakens the case.</li>
+  <li><strong>Step 4:</strong> Conclude by returning to the judgement, explaining its implications for reliability. For 9-mark answers, also suggest improvements.</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "My results mostly supported my hypothesis as pebbles got smaller downstream."</p>
+<p><strong>✅ Strong Answer:</strong> "The data broadly supports the hypothesis. Mean pebble size decreases from 64mm at Site 1 to 23mm at Site 5, showing a consistent downstream reduction. However, one pebble at Site 2 measured 61mm — an anomaly possibly caused by recent bank erosion depositing a fresh, large pebble not yet reduced by attrition. Overall, the hypothesis is supported by the mean values, but this anomaly means the relationship is not perfectly linear, and a larger sample size would increase confidence."</p>
+<p><strong>Sentence Starter:</strong> "The data [broadly/partially/strongly] supports the hypothesis because... However, [anomaly or exception] weakens this conclusion... Overall, I conclude that the hypothesis is [verdict] because..."</p>`,
+      pills: ["U", "app", "an", "eval"]
+    },
+    {
+      type: "Assess — 6 marks",
+      title: "Weigh Strengths Against Weaknesses — Then Judge",
+      content: `<p>6-mark 'assess' questions ask you to evaluate your fieldwork methods by weighing their strengths against their limitations and reaching a balanced, reasoned judgement. Generic answers that could apply to any enquiry will not score highly.</p>
+<p><strong>The Formula:</strong></p>
+<ul>
+  <li><strong>Step 1:</strong> Name and briefly describe the method(s) used.</li>
+  <li><strong>Step 2:</strong> Assess a strength — link it to reliability or validity of the data.</li>
+  <li><strong>Step 3:</strong> Assess a limitation — explain what it meant for the accuracy or representativeness of results.</li>
+  <li><strong>Step 4:</strong> Suggest a specific improvement with a clear explanation of the benefit.</li>
+  <li><strong>Step 5:</strong> Reach an overall judgement — how well did the method allow you to test the hypothesis?</li>
+</ul>
+<p><strong>❌ Weak Answer:</strong> "The method was mostly good but there were some problems. We could have used better equipment."</p>
+<p><strong>✅ Strong Answer:</strong> "We used the float method, repeating it five times at each site and calculating a mean, which reduced the effect of anomalous results caused by turbulence. However, the cork only measures surface velocity — not the mean velocity of the whole water column — so our readings may have overestimated true velocity, reducing validity. Using a flow meter at mid-depth would have given more accurate cross-section readings. Overall, the method was sufficient to identify a velocity trend across five sites, but not accurate enough for precise quantitative comparison."</p>
+<p><strong>Key vocabulary to use:</strong> reliability, validity, accuracy, representative, bias, sample size, anomaly, correlation.</p>`,
+      pills: ["U", "app", "an", "eval"]
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 9: flashcards  (20 entries)
+  ══════════════════════════════════════════════ */
+
+  const flashcards = [
+    { term: "Aim", def: "A broad statement explaining what the geographical enquiry is trying to achieve, e.g. 'An investigation into changes in beach profiles along Mappleton Beach.'" },
+    { term: "Hypothesis", def: "A specific, directional and measurable statement that can be tested by collecting fieldwork data, e.g. 'Pebble size decreases with distance from the source.'" },
+    { term: "Bradshaw's Model", def: "A model predicting changes from source to mouth in a river: discharge, width, depth and velocity increase; load particle size, bed roughness and slope gradient all decrease." },
+    { term: "Primary data", def: "Data collected first-hand by YOU during YOUR enquiry. Examples: questionnaire responses, river velocity readings, pebble measurements, field photographs, traffic counts." },
+    { term: "Secondary data", def: "Data collected by someone else and used by the student. Examples: census records, Environment Agency flood data, old maps, weather station records, newspaper articles." },
+    { term: "Random sampling", def: "A sampling method using a numbered grid and random number generator so every site has an equal chance of selection. Least biased, but may miss important areas by chance." },
+    { term: "Systematic sampling", def: "A sampling method where data is collected at fixed regular intervals, e.g. every 50m along a transect or every 10th person surveyed. Easy to carry out but not fully random." },
+    { term: "Stratified sampling", def: "A sampling method where the sample reflects the proportional make-up of the population. If 20% of visitors are over 60, then 20% of questionnaire respondents must be over 60." },
+    { term: "Quantitative data", def: "Data recorded as numbers, enabling statistical analysis. Examples: river velocity (m/s), pebble size (mm), EQS score, pedestrian count, temperature (°C)." },
+    { term: "Qualitative data", def: "Descriptive, non-numerical data. Examples: annotated field sketches, photographs, open interview answers. More in-depth but harder to compare and analyse statistically." },
+    { term: "Environmental Quality Survey (EQS)", def: "A technique using a bipolar scale (e.g. -2 to +2) or sliding scale (1–5) to score environmental conditions at a site. Produces quantitative data but is subjective." },
+    { term: "Scatter graph", def: "A graph plotting two variables to test for correlation. Points must NEVER be joined — draw a single straight line of best fit with roughly equal numbers of points on each side." },
+    { term: "Choropleth map", def: "A map that uses different shading intensities or patterns across areas to show variation in a value, such as population density, house prices or deprivation indices." },
+    { term: "Isoline map", def: "A map with lines connecting points of equal value, e.g. temperature isolines or contour lines. Lines must never touch or cross. The 16°C isoline connects all points at exactly 16°C." },
+    { term: "Anomaly", def: "A result that does not fit the general pattern or trend in a data set. Must be identified, described and given a geographical explanation — never simply ignored or removed." },
+    { term: "Mean", def: "The arithmetic average: add all values and divide by the number of values. Affected by extreme results (anomalies) more than the median." },
+    { term: "Median", def: "The middle value of a data set arranged in rank order. Less distorted by anomalies than the mean. If there is an even number of values, average the two middle values." },
+    { term: "Range", def: "A measure of dispersion: the highest value minus the lowest value. Easy to calculate but sensitive to anomalies at either extreme." },
+    { term: "Pilot study", def: "A trial run of data collection methods carried out before the main enquiry, used to identify and fix problems with equipment, questionnaire questions or site selection." },
+    { term: "What should an evaluation include?", def: "Limitations of the data collection methods; specific improvements with reasons; comment on the reliability of the conclusion; suggestions for extending the scope of the enquiry." }
+  ];
+
+  /* ══════════════════════════════════════════════
+     ARRAY 10: examQuestions  (6 entries)
+  ══════════════════════════════════════════════ */
+
+  const examQuestions = [
+    {
+      num: "Q1",
+      marks: 1,
+      type: "mcq",
+      caseStudy: "",
+      question: "Which of the following is an example of secondary data? [1 mark]",
+      options: [
+        "Pedestrian counts recorded by students at six sites in a town centre",
+        "Pebble sizes measured by students along a beach",
+        "Historical river discharge records from the Environment Agency",
+        "Questionnaire responses collected from local residents"
+      ],
+      answer: 2,
+      hint: "Secondary data is collected by someone else, not by you during your enquiry.",
+      starter: "The correct answer is C because...",
+      markScheme: `<div class="marks-section">
+<h5>Answer: C — 1 mark</h5>
+<p><strong>C is correct:</strong> Historical river discharge records from the Environment Agency were collected by an external organisation, not by the student. This makes them secondary data.</p>
+<ul>
+  <li><strong>Why A is wrong:</strong> Pedestrian counts recorded by students are primary data — collected first-hand during the enquiry.</li>
+  <li><strong>Why B is wrong:</strong> Pebble sizes measured by the students themselves are primary data.</li>
+  <li><strong>Why D is wrong:</strong> Questionnaire responses collected by students from residents are primary data — the students conducted the survey themselves.</li>
+</ul>
+</div>`,
+      modelAnswer: ""
+    },
+    {
+      num: "Q2",
+      marks: 2,
+      type: "written",
+      caseStudy: `Students surveyed 100 visitors to Bournemouth, a coastal resort in Dorset. Their results showed that most visitors came from southern England — particularly the South East (20 visitors) and West Midlands (16 visitors). Fewer visitors travelled from Scotland (4), Wales (4) and Northern Ireland (2).`,
+      question: "Suggest one additional question that could be added to the visitor survey. Give one reason why your suggested question might provide useful information. [2 marks]",
+      hint: "Think about information NOT already covered by the survey — e.g. how long visitors stay, how much they spend, or whether they have visited before.",
+      starter: "An additional question could be: '...'\nThis would provide useful information because...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks</h5>
+<ul>
+  <li><strong>1 mark:</strong> A valid additional question not already covered by the existing survey (e.g. "How many nights are you staying in Bournemouth?" / "How much do you plan to spend during your visit?" / "Is this your first visit to Bournemouth?")</li>
+  <li><strong>1 mark:</strong> A reason directly linked to the question that explains the value of the information (e.g. "This would show whether visitors are day-trippers or staying overnight, which would indicate their economic impact on the resort.")</li>
+</ul>
+<p><strong>Do NOT award:</strong> A question that duplicates existing survey content (e.g. "Where did you travel from?"). The reason must be linked to the specific question proposed — a generic reason will not gain the second mark.</p>
+<p><strong>Examiner's Comment:</strong> Most students can suggest a suitable question but lose the second mark with a vague reason such as "it gives more information." The reason must explain what decision-making or geographical insight the new data would enable.</p>
+</div>`,
+      modelAnswer: "An additional question could be: 'How long are you staying in Bournemouth?' This would provide useful information because it would reveal whether visitors are day-trippers or staying overnight, allowing the enquiry to assess the full economic impact of tourism on the resort and whether visitor spending patterns differ by length of stay."
+    },
+    {
+      num: "Q3",
+      marks: 2,
+      type: "written",
+      caseStudy: `A student investigated environmental quality at six sites along a transect through their local town centre. At each site they completed a bipolar Environmental Quality Survey, scoring ten indicators from -2 (very negative) to +2 (very positive). Site A (nearest the shopping street) scored +8; Site F (furthest away, 500m) scored -6.
+
+One advantage noted: the survey was quick to complete and easy to calculate. One disadvantage noted: two students gave very different scores for "building maintenance" at Site C.`,
+      question: "Using the information above, suggest one advantage and one disadvantage of using the EQS technique to measure environmental quality. [2 marks]",
+      hint: "Use the information from the case study to support your answers — don't just list generic points.",
+      starter: "Advantage: ...\nDisadvantage: ...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 2 marks (1 + 1)</h5>
+<ul>
+  <li><strong>1 mark for a valid advantage:</strong> e.g. Quick to complete and easy to compare scores across sites / Produces a numerical total that allows statistical comparison / Considers a range of environmental factors in one survey.</li>
+  <li><strong>1 mark for a valid disadvantage:</strong> e.g. Subjective — different students may score the same indicator differently, as shown by the two different "building maintenance" scores at Site C / Categories may not cover all relevant aspects of environmental quality / Results can be inconsistent if not completed by the same person at all sites.</li>
+</ul>
+<p><strong>Do NOT award:</strong> Advantages or disadvantages that contradict each other within the same answer, or points not relevant to the EQS technique.</p>
+<p><strong>Examiner's Comment:</strong> Students frequently give correct generic points but miss the instruction to use the information provided. Referring to the scenario (e.g. the different scores at Site C) demonstrates application and is more likely to be credited.</p>
+</div>`,
+      modelAnswer: "Advantage: The EQS is quick to complete and produces a numerical total score, making it easy to compare environmental quality between different sites along the transect.\n\nDisadvantage: It is subjective — as shown by the two different scores for 'building maintenance' at Site C, different students may assess the same feature differently, reducing the reliability of the data."
+    },
+    {
+      num: "Q4",
+      marks: 3,
+      type: "written",
+      caseStudy: `Students investigated whether pedestrian footfall decreases with distance from the main shopping street in their town. They counted pedestrians for five minutes at six sites at 100m intervals and recorded the results below.
+
+Site A (0m) — Mean: 70 | Site B (100m) — Mean: 56 | Site C (200m) — Mean: 40 | Site D (300m) — Mean: 30 | Site E (400m) — Mean: 20 | Site F (500m) — Mean: 12
+
+Land use survey (units of retail, food and services within 50m of each site):
+Site A: 15 commercial units | Site B: 13 | Site C: 8 | Site D: 5 | Site E: 1 | Site F: 0`,
+      question: "Suggest one conclusion that the students could draw about the relationship between land use and pedestrian footfall. Use evidence from the data to support your answer. [3 marks]",
+      hint: "A conclusion explains what the data MEANS in terms of a geographical relationship — don't just describe the numbers. Quote at least two data values and explain why the pattern exists.",
+      starter: "The data suggests that...\nThis is supported by evidence at Site [X], where..., compared to Site [Y], where...\nThis suggests that...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 3 marks</h5>
+<ul>
+  <li><strong>1 mark:</strong> A valid conclusion identifying a relationship — e.g. "Sites with more commercial land use tend to attract higher pedestrian footfall."</li>
+  <li><strong>1 mark:</strong> Supporting evidence using specific data from both datasets — e.g. "Site A has 15 commercial units and a mean footfall of 70, while Sites E and F have only 1 and 0 commercial units respectively and footfall of just 20 and 12."</li>
+  <li><strong>1 mark:</strong> Development — explaining WHY the relationship exists or what it implies — e.g. "This suggests that the concentration of retail and food outlets is a key driver of pedestrian activity, and that foot traffic declines sharply as the land use becomes less commercial."</li>
+</ul>
+<p><strong>Do NOT award:</strong> Description of data only, without a stated relationship or conclusion. Vague answers without specific data values gain a maximum of 1 mark.</p>
+<p><strong>Examiner's Comment:</strong> Many students describe both datasets separately without drawing a conclusion that links them. Always state the relationship explicitly and use data from BOTH the footfall and land use columns to support it.</p>
+</div>`,
+      modelAnswer: "The data suggests a strong positive relationship between the number of commercial land uses and pedestrian footfall. Site A, closest to the shopping street, has 15 commercial units and a mean footfall of 70, while Sites E and F have just 1 and 0 commercial units respectively, with footfall dropping to 20 and 12. This suggests that the concentration of retail and food outlets near the town centre generates pedestrian activity, and that as land use becomes more residential away from the centre, foot traffic declines sharply — supporting a distance-decay pattern driven by retail provision."
+    },
+    {
+      num: "Q5",
+      marks: 4,
+      type: "written",
+      caseStudy: `Students tested the hypothesis 'Pebble size decreases with distance downstream along Mappleton Beach'. They measured the intermediate axis of 10 pebbles at five sites and calculated the mean.
+
+Results:
+Site 1 (0m from cliff) — Mean: 64mm | Site 2 (20m) — Mean: 54mm | Site 3 (40m) — Mean: 42mm | Site 4 (60m) — Mean: 31mm | Site 5 (80m) — Mean: 23mm
+
+Note: At Site 2, one individual pebble measured 61mm — considerably larger than the site mean of 54mm.`,
+      question: "To what extent does the data support the hypothesis that pebble size decreases with distance from the cliff base? Use data to support your answer. [4 marks]",
+      hint: "'To what extent' means you MUST make a judgement — don't just describe the trend. Acknowledge the anomaly, explain it geographically, and state whether the hypothesis is fully, broadly or partially supported.",
+      starter: "The data [broadly/partially/fully] supports the hypothesis because...\nHowever, the anomaly at Site [X]... suggests...\nOverall, I conclude that the hypothesis is [verdict] because...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 4 marks (Level of Response)</h5>
+<p><strong>Level 1 (1–2 marks):</strong> The response describes the data trend without making a clear evaluative judgement about the extent of support, or makes a judgement without using specific data.</p>
+<p><strong>Level 2 (3–4 marks):</strong> A clear evaluative judgement is made about the extent to which the hypothesis is supported; specific data values are used as evidence; the anomaly at Site 2 is identified and a possible geographical explanation is offered; the response reaches a reasoned overall conclusion about the reliability of the finding.</p>
+<p><strong>Do NOT award Level 2 for:</strong> Responses that only describe the trend without evaluation, or that make a judgement without any data evidence.</p>
+<p><strong>Examiner's Comment:</strong> The most common error is describing the data accurately but failing to make a judgement. The command 'to what extent' requires you to explicitly state how strongly the data supports the hypothesis and to acknowledge any evidence that complicates the picture.</p>
+</div>`,
+      modelAnswer: "The data broadly supports the hypothesis. Mean pebble size decreases consistently from 64mm at Site 1 to just 23mm at Site 5, showing a clear and fairly regular reduction of around 10mm between each consecutive site as you move away from the cliff base. This is consistent with the process of attrition wearing pebbles down as they are transported across the beach.\n\nHowever, the anomaly at Site 2 — where one pebble measured 61mm, close to the Site 1 mean — weakens the case for a strong, consistent correlation. This pebble may have been recently eroded from the cliff face and deposited at Site 2, rather than transported gradually from the cliff base. Its presence increases the mean at Site 2 and reduces the overall regularity of the pattern.\n\nOverall, the hypothesis is broadly supported by the mean values at each site, but the anomaly at Site 2 means the relationship is not perfectly linear. Measuring more pebbles at each site would reduce the influence of individual anomalies and increase confidence in the conclusion."
+    },
+    {
+      num: "Q6",
+      marks: 9,
+      type: "written",
+      caseStudy: "",
+      question: "For one of your fieldwork enquiries, to what extent did your results and conclusions support your original hypothesis or answer your enquiry question? [9 marks]\n\nWrite the title of your enquiry below before you begin your answer.",
+      hint: "Structure: (1) state your hypothesis, (2) present supporting evidence WITH specific data, (3) identify anomalies or limitations and explain why they occurred, (4) evaluate what the data does and does not tell you, (5) reach an overall verdict, (6) suggest improvements. Aim for at least 3–4 developed points with specific figures throughout.",
+      starter: "Title of enquiry: [write your title here]\n\nMy hypothesis was that...\nThe results [broadly/strongly/partially] supported this because... [data]\nHowever, [anomaly/complication] suggested...\nThe variability in [site/data] may have been caused by...\nOverall, I conclude that the hypothesis was [verdict] because...\nTo have answered the enquiry more fully, I could have...",
+      markScheme: `<div class="marks-section">
+<h5>Mark Allocation — 9 marks (Level of Response, AO3 only)</h5>
+<p>A <strong>top Level 3 answer (7–9 marks)</strong> will:</p>
+<ul>
+  <li>State the hypothesis or enquiry question clearly at the outset</li>
+  <li>Use specific data values from fieldwork results to evaluate the extent of support</li>
+  <li>Identify anomalies or inconsistencies and explain their possible geographical causes</li>
+  <li>Comment on the reliability and limitations of the data collected</li>
+  <li>Reach a balanced, evidenced overall judgement about the extent of support</li>
+  <li>Suggest specific improvements that would strengthen the conclusions</li>
+</ul>
+<p><strong>Level 2 (4–6 marks):</strong> Some evaluation of results with data reference, but may lack anomaly discussion, suggested improvements, or a clear overall judgement.</p>
+<p><strong>Level 1 (1–3 marks):</strong> Mostly description of what the data showed, with little or no evaluation or judgement about the extent of support.</p>
+<p><strong>Do NOT award full marks for:</strong> Answers that do not reference a named enquiry, or that only describe results without evaluating them. Vague answers without specific figures are capped at Level 1.</p>
+<p><strong>Examiner's Comment:</strong> Students frequently describe their results accurately but forget to evaluate. 'To what extent' requires a clear verdict at the end. Acknowledging anomalies, discussing their causes, and suggesting improvements that address specific limitations are the hallmarks of a Level 3 response.</p>
+</div>`,
+      modelAnswer: "Title: 'Does pedestrian footfall decrease with distance from the CBD?'\n\nMy hypothesis predicted a negative relationship between distance from the main shopping street and pedestrian footfall. My results provided strong overall support. Mean pedestrian counts decreased consistently from 70 at Site A (0m from the shopping street) to just 12 at Site F (500m away). When plotted on a scatter graph, the line of best fit showed a clear negative trend, consistent with a distance-decay effect.\n\nHowever, there were results that complicated this conclusion. At Site C, my three counts of 37, 42 and 41 gave a relatively wide range of 5. This site was located near a bus stop and a cafe, which may have temporarily inflated or deflated counts depending on bus arrival times, creating variability my method could not control for.\n\nSite E had only two counts rather than three, as a delivery van was obstructing the counting point during the third interval. This reduced the reliability of the mean at that site, though the two recorded values (18 and 22) were consistent with the overall trend.\n\nMy overall conclusion was that the hypothesis was supported by the general pattern, but I recognised the relationship was not perfectly linear — footfall was influenced not only by distance from the CBD but also by local attractors such as bus stops, cafes and vacant units at each site. To have answered the enquiry question more reliably, I could have conducted counts at three different times of day (9am, 12pm and 4pm) to produce a more representative daily mean at each site. Surveying on a Saturday as well as a weekday would have tested whether the distance-decay pattern held across different types of shopping day. Overall, my results and conclusions supported the hypothesis sufficiently to answer the enquiry question, but the variability at some sites means I cannot be fully confident the pattern holds universally."
+    }
+  ];
+
+</script>
+
+
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT ENGINE
+     ══════════════════════════════════════ -->
+<script src="script.js"></script>
+
+
+</body>
+</html>

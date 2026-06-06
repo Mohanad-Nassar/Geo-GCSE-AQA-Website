@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCSE Geography — Revision Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&family=Merriweather:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS Variables — Geography Palette ── */
+    :root {
+      --bg:       #0a1f1a;
+      --surface:  #0f2920;
+      --surface2: #132e24;
+      --border:   #1f4035;
+      --accent:   #2d6a4f;
+      --accent2:  #52b788;
+      --teal:     #0077b6;
+      --gold:     #e9c46a;
+      --mid:      #5e8a76;
+      --text:     #d8ede5;
+      --text-dim: #8ab5a0;
+      --card-bg:  #111f1a;
+      --ink:      #0f293e;
+      --radius:   10px;
+      --shadow:   0 4px 24px rgba(0,0,0,.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* ── Hero Header ── */
+    .hero {
+      background: linear-gradient(135deg, #061410 0%, #0e2a1e 45%, #081a14 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 52px 40px 44px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* Topographic line pattern */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 38px,
+          rgba(45,106,79,.06) 38px, rgba(45,106,79,.06) 39px),
+        repeating-linear-gradient(90deg, transparent, transparent 38px,
+          rgba(45,106,79,.04) 38px, rgba(45,106,79,.04) 39px);
+      pointer-events: none;
+    }
+
+    /* Glow accent circle */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45,106,79,.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-globe {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 16px;
+      position: relative;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(82,183,136,.4));
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #d8ede5;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      padding: 4px 13px;
+      border-radius: 3px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .hero h1 {
+      font-family: 'Merriweather', serif;
+      font-size: clamp(28px, 5vw, 54px);
+      font-weight: 900;
+      color: var(--accent2);
+      line-height: 1.1;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .hero-sub {
+      color: var(--mid);
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: .04em;
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .hero-stat {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--mid);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .hero-stat span:first-child {
+      color: var(--accent2);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Paper Info Banner ── */
+    .paper-banner {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      margin-bottom: 40px;
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .paper-banner-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pb-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--mid);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .pb-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .pb-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ── Topic Cards Grid ── */
+    .q-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+      margin-bottom: 48px;
+    }
+
+    .q-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s, transform .15s, box-shadow .2s;
+      position: relative;
+    }
+
+    .q-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px rgba(0,0,0,.5), 0 0 0 1px rgba(82,183,136,.15);
+    }
+
+    .q-card-accent {
+      height: 3px;
+    }
+
+    /* Different accent colours per card to match geography topic colours */
+    .q-card:nth-child(1) .q-card-accent { background: linear-gradient(90deg, #2d6a4f, #52b788); }
+    .q-card:nth-child(2) .q-card-accent { background: linear-gradient(90deg, #0077b6, #00b4d8); }
+    .q-card:nth-child(3) .q-card-accent { background: linear-gradient(90deg, #e76f51, #f4a261); }
+    .q-card:nth-child(4) .q-card-accent { background: linear-gradient(90deg, #e9c46a, #f4d88a); }
+    .q-card:nth-child(5) .q-card-accent { background: linear-gradient(90deg, #4a6fa5, #6b90c4); }
+    .q-card:nth-child(6) .q-card-accent { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .q-card:nth-child(7) .q-card-accent { background: linear-gradient(90deg, #457b9d, #6ea8c9); }
+    .q-card:nth-child(8) .q-card-accent { background: linear-gradient(90deg, #c47d2a, #e9a44a); }
+    .q-card:nth-child(9) .q-card-accent { background: linear-gradient(90deg, #7b4a9e, #a36dc9); }
+
+    .q-card-body {
+      padding: 22px 22px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .q-card-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+
+    .q-card-title {
+      font-family: 'Merriweather', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .q-card-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    .q-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 22px;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,.18);
+    }
+
+    .q-card-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-bottom: 8px;
+    }
+
+    .q-card-marks {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--mid);
+    }
+
+    .q-card-marks strong {
+      color: var(--accent2);
+    }
+
+    .q-card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      letter-spacing: .04em;
+    }
+
+    .q-card-arrow {
+      position: absolute;
+      bottom: 14px;
+      right: 18px;
+      font-size: 17px;
+      color: var(--accent2);
+      opacity: 0;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .q-card:hover .q-card-arrow { opacity: 1; transform: translateX(3px); }
+
+    /* ── Formula / Mark Breakdown Box ── */
+    .formula-box {
+      background: rgba(45,106,79,.09);
+      border: 1px solid rgba(82,183,136,.2);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--accent2);
+      margin-bottom: 40px;
+      line-height: 1.9;
+    }
+
+    .formula-box strong {
+      color: var(--accent2);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* ── How-to Grid (What's Inside Each Guide) ── */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+
+    .how-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: border-color .2s, background .2s;
+    }
+
+    .how-card:hover {
+      border-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .how-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .how-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .how-desc {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ── Tips callout box ── */
+    .tip-box {
+      background: rgba(0,119,182,.08);
+      border: 1px solid rgba(0,119,182,.25);
+      border-left: 3px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 40px;
+      font-size: 13.5px;
+      color: #a8d5f0;
+      line-height: 1.7;
+    }
+
+    .tip-box strong {
+      color: #5bbfef;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--mid);
+      letter-spacing: .06em;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero { padding: 36px 16px 30px; }
+      main { padding: 28px 14px 48px; }
+      .paper-banner { gap: 18px; }
+      .pb-divider { display: none; }
+      .q-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Custom scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(82,183,136,.2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(82,183,136,.4); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <span class="hero-globe">🌍</span>
+    <div class="hero-badge">AQA GCSE Geography · All Papers</div>
+    <h1>GCSE Geography<br>Revision Hub</h1>
+    <p class="hero-sub">Complete interactive revision suite · Physical, Human &amp; Skills</p>
+    <div class="hero-meta">
+      <div class="hero-stat"><span>3</span><span>Revision Guides</span></div>
+      <div class="hero-stat"><span>9</span><span>Activity Types</span></div>
+      <div class="hero-stat"><span>3</span><span>Papers Covered</span></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── Exam Info Banner ── -->
+    <div class="paper-banner">
+      <div class="paper-banner-item">
+        <span class="pb-label">Exam Board</span>
+        <span class="pb-value">AQA</span>
+      </div>
+      <div class="pb-divider"></div>
+      <div class="paper-banner-item">
+        <span class="pb-label">Qualification</span>
+        <span class="pb-value">GCSE Geography (8035)</span>
+      </div>
+      <div class="pb-divider"></div>
+      <div class="paper-banner-item">
+        <span class="pb-label">Components</span>
+        <span class="pb-value">Paper 1 · Paper 2 · Paper 3</span>
+      </div>
+      <div class="pb-divider"></div>
+      <div class="paper-banner-item">
+        <span class="pb-label">Total Marks</span>
+        <span class="pb-value">120 marks · 2 hr 45 min</span>
+      </div>
+    </div>
+
+    <!-- ── Revision Guides ── -->
+    <div class="section-label">Revision Guides — Choose Your Topic</div>
+
+    <div class="q-grid">
+
+      <!-- 7-1 Issues Evaluation -->
+      <a class="q-card" href="7-1-issues-evaluation.html">
+        <div class="q-card-accent"></div>
+        <div class="q-card-body">
+          <div class="q-card-icon">⚖️</div>
+          <div class="q-card-number">Paper 3 · Section A</div>
+          <div class="q-card-title">Issues Evaluation</div>
+          <div class="q-card-desc">Develop your skills in evaluating geographical issues and evidence. Covers data analysis, reaching a supported conclusion, and how to structure a justified decision under exam conditions.</div>
+        </div>
+        <div class="q-card-footer">
+          <span class="q-card-marks"><strong>37</strong> marks · Paper 3</span>
+          <div class="q-card-tags">
+            <span class="tag">AO2</span>
+            <span class="tag">AO4</span>
+          </div>
+        </div>
+        <span class="q-card-arrow">→</span>
+      </a>
+
+      <!-- 8-1 Fieldwork -->
+      <a class="q-card" href="8-1-fieldwork.html">
+        <div class="q-card-accent"></div>
+        <div class="q-card-body">
+          <div class="q-card-icon">🔬</div>
+          <div class="q-card-number">Paper 3 · Section B</div>
+          <div class="q-card-title">Fieldwork</div>
+          <div class="q-card-desc">Master the 12-mark fieldwork questions. Covers question design, data collection methods, data presentation, analysis, evaluation, and how to compare your own enquiry with an unfamiliar context.</div>
+        </div>
+        <div class="q-card-footer">
+          <span class="q-card-marks"><strong>39</strong> marks · Paper 3</span>
+          <div class="q-card-tags">
+            <span class="tag">AO3</span>
+            <span class="tag">Enquiry</span>
+          </div>
+        </div>
+        <span class="q-card-arrow">→</span>
+      </a>
+
+      <!-- 9-1 Geographical Skills -->
+      <a class="q-card" href="9-1-geographical-skills.html">
+        <div class="q-card-accent"></div>
+        <div class="q-card-body">
+          <div class="q-card-icon">🗺️</div>
+          <div class="q-card-number">All Papers · Cross-topic</div>
+          <div class="q-card-title">Geographical Skills</div>
+          <div class="q-card-desc">Build confidence with all the skills tested across papers — OS map reading, graph and data interpretation, statistical techniques, photo analysis, and completing geographical calculations.</div>
+        </div>
+        <div class="q-card-footer">
+          <span class="q-card-marks"><strong>~44</strong> marks across papers</span>
+          <div class="q-card-tags">
+            <span class="tag">Maps</span>
+            <span class="tag">Data</span>
+            <span class="tag">AO4</span>
+          </div>
+        </div>
+        <span class="q-card-arrow">→</span>
+      </a>
+
+    </div>
+
+    <!-- ── Study Tip ── -->
+    <div class="tip-box">
+      <strong>💡 Study Tip</strong>
+      Start with <strong>Geographical Skills</strong> — these appear across all three papers and boost marks everywhere. Then tackle <strong>Fieldwork</strong> (the biggest Paper 3 section), and finish with <strong>Issues Evaluation</strong> to practise your decision-making and extended writing.
+    </div>
+
+    <!-- ── Paper Overview ── -->
+    <div class="section-label">AQA GCSE Geography — Paper Overview</div>
+
+    <div class="formula-box">
+      <strong>At a Glance · All Three Papers</strong>
+      Paper 1 &nbsp;·&nbsp; Living with the Physical Environment &nbsp;·&nbsp; 88 marks &nbsp;·&nbsp; 1 hr 30 min<br>
+      Paper 2 &nbsp;·&nbsp; Challenges in the Human Environment &nbsp;&nbsp;·&nbsp; 88 marks &nbsp;·&nbsp; 1 hr 30 min<br>
+      Paper 3 &nbsp;·&nbsp; Geographical Applications &nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 76 marks &nbsp;·&nbsp; 1 hr 15 min<br>
+      ─────────────────────────────────────────────────────────<br>
+      Total &nbsp;&nbsp;·&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong style="color:var(--accent2)">252 marks &nbsp;·&nbsp; 4 hr 15 min</strong>
+    </div>
+
+    <!-- ── What's Inside Each Guide ── -->
+    <div class="section-label">What's Inside Each Guide</div>
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon">📚</div>
+        <div>
+          <div class="how-label">Key Learning</div>
+          <div class="how-desc">Expandable content cards covering all core concepts, techniques, and examples for the question type.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">❓</div>
+        <div>
+          <div class="how-label">MCQ Quiz</div>
+          <div class="how-desc">Multiple-choice questions with instant feedback and detailed explanations for every option.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">🔗</div>
+        <div>
+          <div class="how-label">Keyword Matching</div>
+          <div class="how-desc">Drag-and-match key terms to their definitions to build precise subject vocabulary.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">✏️</div>
+        <div>
+          <div class="how-label">Fill in the Blanks</div>
+          <div class="how-desc">Complete sentences using a word bank — tests recall of key facts, dates, and exam technique rules.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">✅</div>
+        <div>
+          <div class="how-label">True / False</div>
+          <div class="how-desc">Challenge common misconceptions with statements that target the most frequent student errors.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">⚠️</div>
+        <div>
+          <div class="how-label">Misconceptions</div>
+          <div class="how-desc">See exactly what examiners warn about and learn the accurate, mark-scheme-approved response.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">🎯</div>
+        <div>
+          <div class="how-label">Exam Tips</div>
+          <div class="how-desc">Step-by-step formula for each question type with weak vs. strong answer examples and sentence starters.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">🃏</div>
+        <div>
+          <div class="how-label">Flashcards</div>
+          <div class="how-desc">Flip-card revision of every key term, technique, and past-exam example — ideal for last-minute review.</div>
+        </div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">📝</div>
+        <div>
+          <div class="how-label">Exam Practice</div>
+          <div class="how-desc">Real exam-style questions with hints, sentence starters, mark schemes, and full model answers.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    AQA GCSE Geography · 8035 · Revision Suite · Papers 1, 2 &amp; 3
+  </footer>
+
+</body>
+</html>

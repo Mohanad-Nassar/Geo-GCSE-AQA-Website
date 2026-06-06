@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="badge">OCR GCSE Art &amp; Design — Printmaking</div>
+    <h1>Printmaking Techniques</h1>
+    <p>Interactive revision guide · Silkscreen, Block, Monoprinting &amp; Etching</p>
+  </div>
+  <a href="index.html" class="home-link">← 🏡 Home</a>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" onclick="switchTab('learn',this)">📚 Key Learning</button>
+  <button class="tab-btn" onclick="switchTab('mcq',this)">❓ MCQ Quiz</button>
+  <button class="tab-btn" onclick="switchTab('matching',this)">🔗 Matching</button>
+  <button class="tab-btn" onclick="switchTab('fib',this)">✏️ Fill the Blanks</button>
+  <button class="tab-btn" onclick="switchTab('misconceptions',this)">⚠️ Misconceptions</button>
+  <button class="tab-btn" onclick="switchTab('examtips',this)">🎯 Exam Tips</button>
+  <button class="tab-btn" onclick="switchTab('flashcards',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="switchTab('truefalse',this)">✅ True / False</button>
+  <button class="tab-btn" onclick="switchTab('exampractice',this)">📝 Exam Practice</button>
+</nav>
+
+<main>
+  <!-- KEY LEARNING -->
+  <div class="tab-panel active" id="tab-learn">
+    <h2 class="section-title">Key Learning Topics</h2>
+    <p class="section-sub">Double-click any card to expand detailed notes.</p>
+    <div class="topic-grid" id="topicGrid"></div>
+  </div>
+  <!-- MCQ -->
+  <div class="tab-panel" id="tab-mcq">
+    <h2 class="section-title">Multiple Choice Questions</h2>
+    <p class="section-sub">Select an answer to reveal instant feedback.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="mcqScore">0</div><div style="font-size:12px;color:var(--mid)">correct answers</div></div>
+      <div style="font-size:13px;color:var(--mid)">out of <strong id="mcqTotal">0</strong> attempted</div>
+      <button class="reset-btn" onclick="resetMCQ()">RESET</button>
+    </div>
+    <div class="quiz-wrap" id="mcqWrap"></div>
+  </div>
+  <!-- MATCHING -->
+  <div class="tab-panel" id="tab-matching">
+    <h2 class="section-title">Matching Activity</h2>
+    <p class="section-sub">Click a term on the left, then click the matching definition on the right.</p>
+    <div style="margin-bottom:16px">
+      <div class="score-bar">
+        <div><div class="score-num" id="matchScore">0</div><div style="font-size:12px;color:var(--mid)">matched</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="matchTotal">0</strong></div>
+        <button class="reset-btn" onclick="resetMatch()">RESET</button>
+      </div>
+    </div>
+    <div class="match-grid">
+      <div><div class="match-label">TERMS</div><div class="match-col" id="matchLeft"></div></div>
+      <div><div class="match-label">DEFINITIONS</div><div class="match-col" id="matchRight"></div></div>
+    </div>
+  </div>
+  <!-- FIB -->
+  <div class="tab-panel" id="tab-fib">
+    <h2 class="section-title">Fill in the Blanks</h2>
+    <p class="section-sub">Click each dropdown and choose the correct word. Wrong answers reset — try again!</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="fibScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="fibTotal">0</strong> blanks</div>
+      <button class="reset-btn" onclick="resetFIB()">RESET</button>
+    </div>
+    <div class="fib-wrap" id="fibWrap"></div>
+  </div>
+  <!-- MISCONCEPTIONS -->
+  <div class="tab-panel" id="tab-misconceptions">
+    <h2 class="section-title">Common Misconceptions</h2>
+    <p class="section-sub">What students often think — and what examiners actually want.</p>
+    <div class="misc-list" id="miscList"></div>
+  </div>
+  <!-- EXAM TIPS -->
+  <div class="tab-panel" id="tab-examtips">
+    <h2 class="section-title">Exam Questions &amp; Tips</h2>
+    <p class="section-sub">Most repeated question types and mark-scheme structures from real OCR papers.</p>
+    <div class="tips-grid" id="tipsGrid"></div>
+  </div>
+  <!-- FLASHCARDS -->
+  <div class="tab-panel" id="tab-flashcards">
+    <h2 class="section-title">Flashcards</h2>
+    <p class="section-sub">Test yourself! Flip the card and rate your knowledge. Review your weak areas at the end.</p>
+    <div class="fc-container">
+      <div class="score-bar" id="fcScoreBar" style="display:none;margin-bottom:20px">
+        <div><div class="score-num" id="fcKnown" style="color:#2d7a4f">0</div><div style="font-size:12px;color:var(--mid)">known</div></div>
+        <div><div class="score-num" id="fcUnknown" style="color:#c84b31">0</div><div style="font-size:12px;color:var(--mid)">learning</div></div>
+        <div style="font-size:13px;color:var(--mid)">out of <strong id="fcTotalTrack">0</strong></div>
+        <button class="reset-btn" onclick="resetFlashcards()">RESET</button>
+      </div>
+      <div id="fcActiveArea">
+        <div class="fc-progress" id="fcProgress">Card 1 of 0</div>
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="fc-inner">
+            <div class="fc-front"><div class="fc-label">KEY TERM</div><div class="fc-term" id="fcTerm"></div></div>
+            <div class="fc-back"><div class="fc-def" id="fcDef"></div></div>
+          </div>
+        </div>
+        <p class="fc-hint">👆 Click card to flip</p>
+        <div class="fc-nav" id="fcNavDefault">
+          <button class="fc-btn outline" onclick="prevCard()">← Prev</button>
+          <button class="fc-btn outline" onclick="flipCard()">Flip</button>
+          <button class="fc-btn" onclick="nextCard()">Next →</button>
+        </div>
+        <div class="fc-nav" id="fcNavAssess" style="display:none;gap:15px">
+          <button class="fc-btn outline" style="border-color:#c84b31;color:#c84b31;flex:1" onclick="markCard(false)">❌ Still Learning</button>
+          <button class="fc-btn" style="background:#2d7a4f;border-color:#2d7a4f;flex:1" onclick="markCard(true)">✅ Got It</button>
+        </div>
+      </div>
+      <div id="fcSummaryArea" style="display:none;text-align:center;padding:40px 20px">
+        <h3>Session Complete! 🎉</h3>
+        <p style="margin:15px 0">You knew <strong id="fcSummaryKnown">0</strong> out of <strong id="fcSummaryTotal">0</strong> cards.</p>
+        <div style="margin-top:25px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap">
+          <button class="fc-btn" id="btnReviewWrong" onclick="reviewWrong()" style="background:#c84b31;border-color:#c84b31">Review Incorrect</button>
+          <button class="fc-btn outline" onclick="resetFlashcards()">Practice All Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- TRUE / FALSE -->
+  <div class="tab-panel" id="tab-truefalse">
+    <h2 class="section-title">True or False?</h2>
+    <p class="section-sub">Test your knowledge with these statements.</p>
+    <div class="score-bar">
+      <div><div class="score-num" id="tfScore">0</div><div style="font-size:12px;color:var(--mid)">correct</div></div>
+      <div style="font-size:13px;color:var(--mid)">of <strong id="tfTotal">0</strong> answered</div>
+      <button class="reset-btn" onclick="resetTF()">RESET</button>
+    </div>
+    <div class="tf-wrap" id="tfWrap"></div>
+  </div>
+  <!-- EXAM PRACTICE -->
+  <div class="tab-panel" id="tab-exampractice">
+    <h2 class="section-title">Exam Practice Questions</h2>
+    <p class="section-sub">Full exam questions with case studies. Use <strong>Hint</strong>, <strong>Sentence Starter</strong> and <strong>Submit &amp; See Mark Scheme</strong> for each question.</p>
+    <div class="ep-list" id="epList"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════
+     DATA ARRAYS
+     ══════════════════════════════════════ -->
+
+
+
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT ENGINE
+     ══════════════════════════════════════ -->
+<script src="script.js"></script>
+
+
+</body>
+</html>
