@@ -118,43 +118,398 @@ function resetMCQ() {
 let matchSelected = null, matchScore = 0, matchTotal = 0;
 const matchMistakes = new Set();
 let matchLocked = false;
-function buildMatch() {
+let matchRound = 1;
+let matchRoundScores = [0, 0];
+let matchRoundSize = 0; // 0 = auto (split in half)
+
+function getMatchRoundSize() {
+    // If a custom size is set, use it; otherwise half the deck (rounded up)
+    return matchRoundSize > 0 ? matchRoundSize : Math.ceil(matchData.length / 2);
+}
+
+function getMatchRoundData(round) {
+    const size = getMatchRoundSize();
+    return round === 1 ? matchData.slice(0, size) : matchData.slice(size);
+}
+
+// ── Find the score bar that contains matchScore — works regardless of tab ID
+function getMatchScoreBar() {
+    const el = document.getElementById('matchScore');
+    return el ? el.closest('.score-bar') : null;
+}
+
+// ── Inject the round-size picker into the score bar (beside Randomise / Reset)
+function injectMatchSizePicker() {
+    if (document.getElementById('matchSizePicker')) return;
+    const scoreBar = getMatchScoreBar();
+    if (!scoreBar) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
+    const lbl = document.createElement('label');
+    lbl.htmlFor = 'matchSizePicker';
+    lbl.style.cssText = "font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;";
+    lbl.textContent = 'Per round:';
+
+    const sel = document.createElement('select');
+    sel.id = 'matchSizePicker';
+    sel.style.cssText = `
+        appearance:none; -webkit-appearance:none;
+        background:var(--surface2); border:1.5px solid var(--border);
+        border-radius:6px; padding:5px 10px;
+        font-family:'DM Mono',monospace; font-size:11px; font-weight:600;
+        color:var(--accent2); cursor:pointer; outline:none;
+        transition:border-color .15s;
+    `;
+    sel.addEventListener('focus', () => sel.style.borderColor = 'var(--accent2)');
+    sel.addEventListener('blur', () => sel.style.borderColor = 'var(--border)');
+
+    // Build options: Auto, then 4 up to matchData.length-1 (always leave at least 1 in round 2)
+    const autoOpt = document.createElement('option');
+    autoOpt.value = '0';
+    autoOpt.textContent = 'Auto';
+    sel.appendChild(autoOpt);
+
+    const max = matchData.length - 1; // at least 1 item must go to round 2
+    for (let i = 4; i <= max; i++) {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = String(i);
+        sel.appendChild(opt);
+    }
+    sel.value = '0';
+
+    sel.addEventListener('change', () => {
+        matchRoundSize = parseInt(sel.value, 10);
+        rebuildMatchHeader(); // update bars to reflect new sizes
+        resetMatch();
+    });
+
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(sel);
+
+    // Put it before the first .reset-btn in the score bar
+    const resetBtn = scoreBar.querySelector('.reset-btn');
+    if (resetBtn) { scoreBar.insertBefore(wrapper, resetBtn); }
+    else scoreBar.appendChild(wrapper);
+}
+
+// ── Rebuild header (on size change)
+function rebuildMatchHeader() {
+    const old = document.getElementById('matchRoundHeader');
+    if (old) old.remove();
+    injectMatchHeader();
+}
+
+// ── Inject the round header: overall bar + per-round bars
+// Called AFTER buildMatchRound so matchLeft exists in the DOM
+function injectMatchHeader() {
+    if (document.getElementById('matchRoundHeader')) return;
+
+    const r1count = getMatchRoundData(1).length;
+    const r2count = getMatchRoundData(2).length;
+    const total = r1count + r2count;
+
+    const header = document.createElement('div');
+    header.id = 'matchRoundHeader';
+    header.style.cssText = `
+        background:var(--surface2);
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:16px 20px;
+        margin-bottom:16px;
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+    `;
+    header.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:.12em;text-transform:uppercase;">🃏 Matching — 2 Rounds</span>
+            <span id="matchRoundLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);letter-spacing:.08em;">Currently on Round 1 of 2</span>
+        </div>
+        <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);letter-spacing:.06em;text-transform:uppercase;">Overall Progress</span>
+                <span id="matchOverallLabel" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);">0 / ${total}</span>
+            </div>
+            <div style="background:var(--border);border-radius:99px;height:10px;overflow:hidden;">
+                <div id="matchBarOverall" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--gold));border-radius:99px;transition:width .4s ease;"></div>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);width:60px;flex-shrink:0;">Round 1</span>
+                <div style="flex:1;background:var(--border);border-radius:99px;height:7px;overflow:hidden;">
+                    <div id="matchBar1" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease;"></div>
+                </div>
+                <span id="matchBarLabel1" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);width:40px;text-align:right;">0/${r1count}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);width:60px;flex-shrink:0;">Round 2</span>
+                <div style="flex:1;background:var(--border);border-radius:99px;height:7px;overflow:hidden;">
+                    <div id="matchBar2" style="height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--accent2));border-radius:99px;transition:width .4s ease;opacity:.35;"></div>
+                </div>
+                <span id="matchBarLabel2" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);width:40px;text-align:right;">0/${r2count}</span>
+            </div>
+        </div>
+    `;
+
+    // Insert directly before the match grid wrapper
+    const matchLeft = document.getElementById('matchLeft');
+    const matchGrid = matchLeft ? (matchLeft.closest('.match-grid') || matchLeft.parentElement) : null;
+    if (matchGrid) {
+        matchGrid.parentElement.insertBefore(header, matchGrid);
+    } else {
+        const scoreBar = getMatchScoreBar();
+        if (scoreBar) scoreBar.after(header);
+    }
+}
+
+// ── Update per-round bar + overall bar
+function updateMatchProgress(round) {
+    const r1data = getMatchRoundData(1);
+    const r2data = getMatchRoundData(2);
+    const data = round === 1 ? r1data : r2data;
+    const total = data.length;
+    const left = document.getElementById('matchLeft');
+    if (!left) return;
+
+    const done = round === matchRound
+        ? left.querySelectorAll('.matched-ok, .matched-eventual').length
+        : (round < matchRound ? total : 0);
+    const pct = total ? (done / total) * 100 : 0;
+
+    const bar = document.getElementById(`matchBar${round}`);
+    const lbl = document.getElementById(`matchBarLabel${round}`);
+    if (bar) bar.style.width = pct + '%';
+    if (lbl) lbl.textContent = `${done}/${total}`;
+
+    // Overall bar
+    const r1done = matchRound > 1 ? r1data.length : (round === 1 ? done : 0);
+    const r2done = matchRound > 1 && round === 2 ? done : 0;
+    const grandTotal = r1data.length + r2data.length;
+    const grandDone = r1done + r2done;
+    const overallPct = grandTotal ? (grandDone / grandTotal) * 100 : 0;
+    const overallBar = document.getElementById('matchBarOverall');
+    const overallLbl = document.getElementById('matchOverallLabel');
+    if (overallBar) overallBar.style.width = overallPct + '%';
+    if (overallLbl) overallLbl.textContent = `${grandDone} / ${grandTotal}`;
+}
+
+// ── Celebration overlay
+function showMatchCelebration() {
+    if (!document.getElementById('matchCelebStyles')) {
+        const s = document.createElement('style');
+        s.id = 'matchCelebStyles';
+        s.textContent = `
+            @keyframes celebBounceIn {
+                0%   { opacity:0; transform:translate(-50%,-50%) scale(.5) rotate(-4deg); }
+                60%  { opacity:1; transform:translate(-50%,-50%) scale(1.08) rotate(2deg); }
+                80%  { transform:translate(-50%,-50%) scale(.97) rotate(-1deg); }
+                100% { transform:translate(-50%,-50%) scale(1) rotate(0deg); }
+            }
+            @keyframes celebBounceOut {
+                0%   { opacity:1; transform:translate(-50%,-50%) scale(1); }
+                100% { opacity:0; transform:translate(-50%,-50%) scale(.8); }
+            }
+            @keyframes celebFloat {
+                0%,100% { transform:translateY(0); }
+                50%     { transform:translateY(-8px); }
+            }
+            @keyframes confettiFall {
+                0%   { transform:translateY(-20px) rotate(0deg); opacity:1; }
+                100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+            }
+        `;
+        document.head.appendChild(s);
+    }
+
+    const colours = ['#52b788', '#e9c46a', '#0077b6', '#e76f51', '#d8ede5'];
+    for (let i = 0; i < 65; i++) {
+        const piece = document.createElement('div');
+        piece.style.cssText = `
+            position:fixed; top:0;
+            left:${Math.random() * 100}vw;
+            width:${6 + Math.random() * 8}px; height:${6 + Math.random() * 8}px;
+            background:${colours[Math.floor(Math.random() * colours.length)]};
+            border-radius:${Math.random() > .5 ? '50%' : '2px'};
+            z-index:10001; pointer-events:none;
+            animation:confettiFall ${1.5 + Math.random() * 2}s ${Math.random() * .8}s ease-in forwards;
+        `;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4000);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'matchCelebOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;backdrop-filter:blur(3px);';
+
+    const card = document.createElement('div');
+    card.style.cssText = `
+        position:fixed; top:50%; left:50%;
+        transform:translate(-50%,-50%);
+        background:var(--surface2); border:2px solid var(--accent2);
+        border-radius:16px; padding:36px 40px; text-align:center;
+        z-index:10002; min-width:280px; max-width:90vw;
+        box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(82,183,136,.2);
+        animation:celebBounceIn .55s cubic-bezier(.34,1.56,.64,1) forwards;
+    `;
+
+    const perfect = matchMistakes.size === 0;
+    const r1 = getMatchRoundData(1).length;
+    const r2 = getMatchRoundData(2).length;
+    card.innerHTML = `
+        <div style="font-size:52px;margin-bottom:12px;animation:celebFloat 1.8s ease-in-out infinite;">🎉</div>
+        <div style="font-family:'Merriweather',serif;font-size:22px;font-weight:700;color:var(--accent2);margin-bottom:8px;">
+            ${perfect ? 'Perfect Score!' : 'All Matched!'}
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-dim);margin-bottom:6px;line-height:1.6;">
+            ${perfect
+            ? 'You matched every pair first time — amazing work! 🌟'
+            : `You got there! ${matchMistakes.size} pair${matchMistakes.size > 1 ? 's' : ''} needed a second try.`}
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);margin-bottom:22px;">
+            ${r1} pairs · Round 1 &nbsp;+&nbsp; ${r2} pairs · Round 2
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button id="celebDismiss" style="background:var(--accent);color:var(--text);border:none;border-radius:8px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.06em;">✓ Done</button>
+            <button id="celebReset" style="background:transparent;color:var(--text-dim);border:1.5px solid var(--border);border-radius:8px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.06em;">🔄 Play Again</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(card);
+
+    const dismiss = () => {
+        card.style.animation = 'celebBounceOut .3s ease forwards';
+        overlay.style.transition = 'opacity .3s'; overlay.style.opacity = '0';
+        setTimeout(() => { card.remove(); overlay.remove(); }, 320);
+    };
+    document.getElementById('celebDismiss').addEventListener('click', dismiss);
+    document.getElementById('celebReset').addEventListener('click', () => { dismiss(); setTimeout(resetMatch, 340); });
+    overlay.addEventListener('click', dismiss);
+}
+
+function buildMatchRound(round) {
     const left = document.getElementById('matchLeft');
     const right = document.getElementById('matchRight');
     if (!left || !right) return;
+
+    matchSelected = null; matchLocked = false;
+    left.innerHTML = ''; right.innerHTML = '';
+
+    const old = document.getElementById('matchNextRoundBtn');
+    if (old) old.remove();
+
+    const data = getMatchRoundData(round);
+    const shuffled = [...data].sort(() => Math.random() - .5);
+
+    const label = document.getElementById('matchRoundLabel');
+    if (label) label.textContent = `Currently on Round ${round} of 2`;
+
+    if (round === 2) {
+        const bar2 = document.getElementById('matchBar2');
+        if (bar2) bar2.style.opacity = '1';
+    }
+
+    updateMatchProgress(1);
+    updateMatchProgress(2);
+
     matchTotal = matchData.length;
     document.getElementById('matchTotal').textContent = matchTotal;
-    const shuffled = [...matchData].sort(() => Math.random() - .5);
-    matchData.forEach(m => { const el = document.createElement('div'); el.className='match-item'; el.textContent=m.term; el.dataset.key=m.term; el.dataset.side='left'; left.appendChild(el); });
-    shuffled.forEach(m => { const el = document.createElement('div'); el.className='match-item'; el.textContent=m.def; el.dataset.key=m.term; el.dataset.side='right'; right.appendChild(el); });
+
+    data.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'match-item'; el.textContent = m.term;
+        el.dataset.key = m.term; el.dataset.side = 'left';
+        left.appendChild(el);
+    });
+    shuffled.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'match-item'; el.textContent = m.def;
+        el.dataset.key = m.term; el.dataset.side = 'right';
+        right.appendChild(el);
+    });
+
     left.addEventListener('click', handleMatch);
     right.addEventListener('click', handleMatch);
 }
+
+function buildMatch() {
+    matchScore = 0; matchRound = 1; matchRoundScores = [0, 0];
+    document.getElementById('matchScore').textContent = 0;
+    buildMatchRound(1);      // build grid FIRST so matchLeft exists in DOM
+    injectMatchSizePicker(); // then inject picker into score bar
+    injectMatchHeader();     // then inject header above the grid
+}
+
 function handleMatch(e) {
     if (matchLocked) return;
     const item = e.target.closest('.match-item');
     if (!item || item.classList.contains('matched-ok') || item.classList.contains('matched-eventual')) return;
-    if (!matchSelected) { document.querySelectorAll('.match-item.selected').forEach(x => x.classList.remove('selected')); item.classList.add('selected'); matchSelected = item; }
-    else {
+    if (!matchSelected) {
+        document.querySelectorAll('.match-item.selected').forEach(x => x.classList.remove('selected'));
+        item.classList.add('selected'); matchSelected = item;
+    } else {
         if (matchSelected === item) { item.classList.remove('selected'); matchSelected = null; return; }
-        if (matchSelected.dataset.side === item.dataset.side) { matchSelected.classList.remove('selected'); matchSelected = item; item.classList.add('selected'); return; }
-        const a = matchSelected, b = item; a.classList.remove('selected'); b.classList.remove('selected'); matchSelected = null;
+        if (matchSelected.dataset.side === item.dataset.side) {
+            matchSelected.classList.remove('selected'); matchSelected = item; item.classList.add('selected'); return;
+        }
+        const a = matchSelected, b = item;
+        a.classList.remove('selected'); b.classList.remove('selected'); matchSelected = null;
         if (a.dataset.key === b.dataset.key) {
             const cls = matchMistakes.has(a.dataset.key) ? 'matched-eventual' : 'matched-ok';
-            a.classList.add(cls); b.classList.add(cls); matchScore++; document.getElementById('matchScore').textContent = matchScore;
+            a.classList.add(cls); b.classList.add(cls);
+            matchScore++; matchRoundScores[matchRound - 1]++;
+            document.getElementById('matchScore').textContent = matchScore;
+            updateMatchProgress(matchRound);
+            const left = document.getElementById('matchLeft');
+            const total = left.querySelectorAll('.match-item').length;
+            const done = left.querySelectorAll('.matched-ok, .matched-eventual').length;
+            if (done === total) onRoundComplete();
         } else {
-            matchLocked = true; matchMistakes.add(a.dataset.key); matchMistakes.add(b.dataset.key);
+            matchLocked = true;
+            matchMistakes.add(a.dataset.key); matchMistakes.add(b.dataset.key);
             a.classList.add('matched-no'); b.classList.add('matched-no');
             setTimeout(() => { a.classList.remove('matched-no'); b.classList.remove('matched-no'); matchLocked = false; }, 700);
         }
     }
 }
+
+function onRoundComplete() {
+    if (matchRound === 1) {
+        updateMatchProgress(1);
+        const left = document.getElementById('matchLeft');
+        const grid = left.closest('.match-grid') || left.parentElement;
+        const btn = document.createElement('button');
+        btn.id = 'matchNextRoundBtn';
+        btn.className = 'fc-btn';
+        btn.style.cssText = 'margin-top:16px;width:100%;font-size:14px;padding:14px;';
+        btn.innerHTML = '✅ Round 1 complete — Start Round 2 →';
+        btn.addEventListener('click', () => {
+            matchRound = 2;
+            matchMistakes.clear();
+            buildMatchRound(2);
+        });
+        grid.parentElement.insertBefore(btn, grid.nextSibling);
+    } else {
+        updateMatchProgress(2);
+        setTimeout(showMatchCelebration, 400);
+    }
+}
+
 function resetMatch() {
-    matchScore = 0; matchSelected = null; matchLocked = false; matchMistakes.clear();
+    matchScore = 0; matchSelected = null; matchLocked = false;
+    matchRound = 1; matchRoundScores = [0, 0];
+    matchMistakes.clear();
     document.getElementById('matchScore').textContent = 0;
     document.getElementById('matchLeft').innerHTML = '';
     document.getElementById('matchRight').innerHTML = '';
-    buildMatch();
+    const old = document.getElementById('matchNextRoundBtn');
+    if (old) old.remove();
+    buildMatchRound(1);   // rebuild grid first
+    rebuildMatchHeader(); // then rebuild header with correct totals
 }
 
 // ── BUILD FIB ──
@@ -374,20 +729,20 @@ function buildExamPractice() {
     if (!list) return;
     examQuestions.forEach((q, qi) => {
         const card = document.createElement('div'); card.className = 'ep-card';
-        const caseHtml = q.caseStudy ? `<div class="ep-case">${q.caseStudy.replace(/\n/g,'<br>')}</div>` : '';
+        const caseHtml = q.caseStudy ? `<div class="ep-case">${q.caseStudy.replace(/\n/g, '<br>')}</div>` : '';
         let interactiveHtml = '';
         if (q.type === 'mcq') {
-            interactiveHtml = `<div class="ep-mcq-opts">${q.options.map((o, oi) => `<button class="ep-opt" data-qi="${qi}" data-oi="${oi}"><strong>${String.fromCharCode(65+oi)}.</strong> ${o}</button>`).join('')}</div>`;
+            interactiveHtml = `<div class="ep-mcq-opts">${q.options.map((o, oi) => `<button class="ep-opt" data-qi="${qi}" data-oi="${oi}"><strong>${String.fromCharCode(65 + oi)}.</strong> ${o}</button>`).join('')}</div>`;
         } else {
             interactiveHtml = `<textarea class="ep-answer-area" id="epTextarea-${qi}" placeholder="Write your answer here..."></textarea>`;
         }
         card.innerHTML = `<div class="ep-header">
-<div><div class="ep-num">${q.num}</div><div class="ep-title">${q.marks} mark${q.marks>1?'s':''}</div></div>
-<div class="ep-marks">[${q.marks} mark${q.marks>1?'s':''}]</div>
+<div><div class="ep-num">${q.num}</div><div class="ep-title">${q.marks} mark${q.marks > 1 ? 's' : ''}</div></div>
+<div class="ep-marks">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</div>
 </div>
 <div class="ep-body">
 ${caseHtml}
-<div class="ep-question">${q.question.replace(/\n/g,'<br>')}</div>
+<div class="ep-question">${q.question.replace(/\n/g, '<br>')}</div>
 ${interactiveHtml}
 <div class="ep-btn-row">
 <button class="ep-btn hint-btn" onclick="togglePop(${qi},'hint')">💡 Hint</button>
@@ -395,10 +750,10 @@ ${interactiveHtml}
 ${q.type !== 'mcq' ? `<button class="ep-btn submit-btn" onclick="togglePop(${qi},'marks')">📋 Submit &amp; See Mark Scheme</button>` : ''}
 </div>
 <div class="ep-popup hint-pop" id="epHint-${qi}"><strong>💡 Hint:</strong> ${q.hint}</div>
-<div class="ep-popup starter-pop" id="epStarter-${qi}"><strong>✍️ Sentence Starter:</strong><br>${q.starter.replace(/\n/g,'<br>')}</div>
+<div class="ep-popup starter-pop" id="epStarter-${qi}"><strong>✍️ Sentence Starter:</strong><br>${q.starter.replace(/\n/g, '<br>')}</div>
 <div class="ep-popup marks-pop" id="epMarks-${qi}">
 ${q.markScheme}
-${q.modelAnswer ? `<div class="marks-section"><h5>✓ Model Answer</h5><div class="model-answer">${q.modelAnswer.replace(/\n/g,'<br>')}</div></div>` : ''}
+${q.modelAnswer ? `<div class="marks-section"><h5>✓ Model Answer</h5><div class="model-answer">${q.modelAnswer.replace(/\n/g, '<br>')}</div></div>` : ''}
 </div>
 </div>`;
         list.appendChild(card);
@@ -420,9 +775,9 @@ function togglePop(qi, type) {
     const hint = document.getElementById(`epHint-${qi}`);
     const starter = document.getElementById(`epStarter-${qi}`);
     const marks = document.getElementById(`epMarks-${qi}`);
-    if (type === 'hint')    { hint.classList.toggle('show');    starter.classList.remove('show'); }
+    if (type === 'hint') { hint.classList.toggle('show'); starter.classList.remove('show'); }
     else if (type === 'starter') { starter.classList.toggle('show'); hint.classList.remove('show'); }
-    else if (type === 'marks')  { marks.classList.toggle('show'); }
+    else if (type === 'marks') { marks.classList.toggle('show'); }
 }
 
 // ── SCROLL TO TOP ──
@@ -454,11 +809,11 @@ function injectRandomiseButtons() {
         if (resetBtn.previousElementSibling && resetBtn.previousElementSibling.classList.contains('random-btn')) return;
         const oc = resetBtn.getAttribute('onclick') || '';
         let logic = null;
-        if (oc.includes('resetMCQ'))        logic = () => { mcqData.sort(() => Math.random()-.5); resetMCQ(); };
-        else if (oc.includes('resetMatch')) logic = () => { matchData.sort(() => Math.random()-.5); resetMatch(); };
-        else if (oc.includes('resetFIB'))   logic = () => { fibData.sort(() => Math.random()-.5); resetFIB(); };
-        else if (oc.includes('resetFlash')) logic = () => { flashcards.sort(() => Math.random()-.5); resetFlashcards(); };
-        else if (oc.includes('resetTF'))    logic = () => { tfData.sort(() => Math.random()-.5); resetTF(); };
+        if (oc.includes('resetMCQ')) logic = () => { mcqData.sort(() => Math.random() - .5); resetMCQ(); };
+        else if (oc.includes('resetMatch')) logic = () => { matchData.sort(() => Math.random() - .5); resetMatch(); };
+        else if (oc.includes('resetFIB')) logic = () => { fibData.sort(() => Math.random() - .5); resetFIB(); };
+        else if (oc.includes('resetFlash')) logic = () => { flashcards.sort(() => Math.random() - .5); resetFlashcards(); };
+        else if (oc.includes('resetTF')) logic = () => { tfData.sort(() => Math.random() - .5); resetTF(); };
         if (logic) {
             const rndBtn = document.createElement('button');
             rndBtn.className = 'reset-btn random-btn'; rndBtn.innerHTML = '🔀 RANDOMISE';
@@ -497,5 +852,3 @@ document.addEventListener('DOMContentLoaded', () => {
     if (subEl) subEl.textContent = pageMeta.subtitle;
     if (titleEl) titleEl.textContent = pageMeta.title.replace(/&amp;/g, '&');
 });
-
-
