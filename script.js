@@ -5,6 +5,9 @@ function switchTab(id, btn) {
     document.getElementById('tab-' + id).classList.add('active');
     btn.classList.add('active');
     if (id === 'learn' || id === 'examtips') showDoubleClickHint();
+    // Hide all floating progress bars; the IntersectionObserver on the new
+    // tab will re-show the right one if the user has scrolled past it
+    document.querySelectorAll('.prog-float').forEach(f => f.classList.remove('visible'));
 }
 
 // ── HEADER ACTIONS (Expand All + Grid/List toggle) ──
@@ -73,6 +76,30 @@ function buildLearn() {
 
 // ── BUILD MCQ ──
 let mcqScore = 0, mcqTotal = 0;
+
+function injectMCQProgressBar() {
+    if (document.getElementById('mcqBarWrap')) return;
+    const wrap = document.getElementById('mcqWrap');
+    if (!wrap) return;
+    const bar = createProgressBar('mcq', '❓ Multiple Choice — Progress ');
+    wrap.parentElement.insertBefore(bar, wrap);
+}
+
+function updateMCQProgress() {
+    updateProgressBar('mcq', mcqTotal, mcqData.length);
+    if (mcqTotal > 0 && mcqTotal >= mcqData.length) {
+        const perfect = mcqScore === mcqData.length;
+        setTimeout(() => showCelebration({
+            title: perfect ? 'Full Marks!' : 'Quiz Complete!',
+            subtitle: perfect
+                ? 'Every answer correct — excellent work! 🌟'
+                : `You scored ${mcqScore} out of ${mcqData.length}`,
+            extra: `${mcqData.length} question${mcqData.length !== 1 ? 's' : ''} answered`,
+            onReset: resetMCQ
+        }), 400);
+    }
+}
+
 function buildMCQ() {
     const wrap = document.getElementById('mcqWrap');
     if (!wrap) return;
@@ -104,13 +131,19 @@ function buildMCQ() {
         }
         document.getElementById('mcqScore').textContent = mcqScore;
         document.getElementById('mcqTotal').textContent = mcqTotal;
+        updateMCQProgress();
     });
+    injectMCQProgressBar();
+    updateProgressBar('mcq', 0, mcqData.length);
 }
 function resetMCQ() {
     mcqScore = 0; mcqTotal = 0;
     document.getElementById('mcqScore').textContent = 0;
     document.getElementById('mcqTotal').textContent = 0;
     document.getElementById('mcqWrap').innerHTML = '';
+    destroyProgressBar('mcq');
+    const old = document.getElementById('mcqBarWrap');
+    if (old) old.remove();
     buildMCQ();
 }
 
@@ -508,17 +541,10 @@ function resetMatch() {
     document.getElementById('matchRight').innerHTML = '';
     const old = document.getElementById('matchNextRoundBtn');
     if (old) old.remove();
-    buildMatchRound(1);   // rebuild grid first
-    rebuildMatchHeader(); // then rebuild header with correct totals
+    buildMatchRound(1);
+    rebuildMatchHeader();
 }
 
-// ── BUILD FIB ──
-let fibScore = 0, fibCorrectTotal = 0;
-let isAdvancedFIB = false;
-function isAnswerAcceptable(u, a) {
-    u = u.trim().toLowerCase(); a = a.trim().toLowerCase();
-    return u === a || u + 's' === a || u === a + 's';
-}
 function buildFIB() {
     const wrap = document.getElementById('fibWrap');
     if (!wrap) return;
@@ -607,7 +633,545 @@ function injectFIBAdvancedToggle() {
     fibTab.insertBefore(btn, scoreBar);
 }
 
-// ── BUILD MISCONCEPTIONS ──
+// ══════════════════════════════════════
+// SHARED CELEBRATION (used by FIB, FC, TF, EP)
+// ══════════════════════════════════════
+function injectCelebStyles() {
+    if (document.getElementById('sharedCelebStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'sharedCelebStyles';
+    s.textContent = `
+        @keyframes celebBounceIn  { 0%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(-4deg)} 60%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(2deg)} 80%{transform:translate(-50%,-50%) scale(.97) rotate(-1deg)} 100%{transform:translate(-50%,-50%) scale(1) rotate(0)} }
+        @keyframes celebBounceOut { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(.8)} }
+        @keyframes celebFloat     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes confettiFall   { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+    `;
+    document.head.appendChild(s);
+}
+
+function showCelebration({ title, subtitle, extra = '', onReset }) {
+    injectCelebStyles();
+    const colours = ['#52b788', '#e9c46a', '#0077b6', '#e76f51', '#d8ede5'];
+    for (let i = 0; i < 65; i++) {
+        const p = document.createElement('div');
+        p.style.cssText = `position:fixed;top:0;left:${Math.random() * 100}vw;width:${6 + Math.random() * 8}px;height:${6 + Math.random() * 8}px;background:${colours[Math.floor(Math.random() * colours.length)]};border-radius:${Math.random() > .5 ? '50%' : '2px'};z-index:10001;pointer-events:none;animation:confettiFall ${1.5 + Math.random() * 2}s ${Math.random() * .8}s ease-in forwards;`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 4000);
+    }
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;backdrop-filter:blur(3px);';
+    const card = document.createElement('div');
+    card.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface2);border:2px solid var(--accent2);border-radius:16px;padding:36px 40px;text-align:center;z-index:10002;min-width:280px;max-width:90vw;box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 0 1px rgba(82,183,136,.2);animation:celebBounceIn .55s cubic-bezier(.34,1.56,.64,1) forwards;`;
+    card.innerHTML = `
+        <div style="font-size:52px;margin-bottom:12px;animation:celebFloat 1.8s ease-in-out infinite;">🎉</div>
+        <div style="font-family:'Merriweather',serif;font-size:22px;font-weight:700;color:var(--accent2);margin-bottom:8px;">${title}</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-dim);margin-bottom:${extra ? '6px' : '22px'};line-height:1.6;">${subtitle}</div>
+        ${extra ? `<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);margin-bottom:22px;">${extra}</div>` : ''}
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button id="sharedCelebDismiss" style="background:var(--accent);color:var(--text);border:none;border-radius:8px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.06em;">✓ Done</button>
+            <button id="sharedCelebReset" style="background:transparent;color:var(--text-dim);border:1.5px solid var(--border);border-radius:8px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.06em;">🔄 Try Again</button>
+        </div>`;
+    document.body.appendChild(overlay);
+    document.body.appendChild(card);
+    const dismiss = () => {
+        card.style.animation = 'celebBounceOut .3s ease forwards';
+        overlay.style.transition = 'opacity .3s'; overlay.style.opacity = '0';
+        setTimeout(() => { card.remove(); overlay.remove(); }, 320);
+    };
+    document.getElementById('sharedCelebDismiss').addEventListener('click', dismiss);
+    document.getElementById('sharedCelebReset').addEventListener('click', () => { dismiss(); if (onReset) setTimeout(onReset, 340); });
+    overlay.addEventListener('click', dismiss);
+}
+
+// ══════════════════════════════════════
+// SHARED PROGRESS BAR HELPERS
+// ══════════════════════════════════════
+// ── Progress bar styles (injected once)
+function injectProgressStyles() {
+    if (document.getElementById('progressBarStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'progressBarStyles';
+    s.textContent = `
+        .prog-inline {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+        }
+        .prog-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .prog-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--mid);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .prog-count {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--mid);
+        }
+        .prog-track {
+            background: var(--border);
+            border-radius: 99px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .prog-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+            border-radius: 99px;
+            transition: width .45s cubic-bezier(.4,0,.2,1);
+        }
+        .prog-float {
+            position: fixed;
+            top: 52px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-12px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s ease, transform .3s cubic-bezier(.34,1.3,.64,1);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom: 2px solid var(--accent2);
+            border-radius: 0 0 12px 12px;
+            padding: 7px 18px 9px;
+            min-width: 200px;
+            max-width: min(440px, 88vw);
+            width: max-content;
+            box-shadow: 0 6px 24px rgba(0,0,0,.45);
+            backdrop-filter: blur(6px);
+        }
+        .prog-float.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .prog-float .prog-row { margin-bottom: 4px; }
+        .prog-float .prog-label { font-size: 9px; }
+        .prog-float .prog-count { font-size: 9px; }
+        .prog-float .prog-track { height: 5px; }
+        @keyframes progPulse {
+            0%   { box-shadow: 0 6px 24px rgba(0,0,0,.45), 0 0 0 0 rgba(82,183,136,.5); }
+            70%  { box-shadow: 0 6px 24px rgba(0,0,0,.45), 0 0 0 7px rgba(82,183,136,0); }
+            100% { box-shadow: 0 6px 24px rgba(0,0,0,.45), 0 0 0 0 rgba(82,183,136,0); }
+        }
+        .prog-float.pulse { animation: progPulse .5s ease; }
+    `;
+    document.head.appendChild(s);
+}
+
+// Registry of all active progress bar IDs — used by the scroll handler
+const _progIds = [];
+
+function createProgressBar(id, label) {
+    injectProgressStyles();
+
+    // Inline bar
+    const wrap = document.createElement('div');
+    wrap.id = id + 'BarWrap';
+    wrap.className = 'prog-inline';
+    wrap.innerHTML = `
+        <div class="prog-row">
+            <span class="prog-label">${label}</span>
+            <span class="prog-count" id="${id}BarLabel">0 / 0</span>
+        </div>
+        <div class="prog-track">
+            <div class="prog-fill" id="${id}Bar"></div>
+        </div>`;
+
+    // Floating twin
+    const floater = document.createElement('div');
+    floater.id = id + 'BarFloat';
+    floater.className = 'prog-float';
+    floater.innerHTML = `
+        <div class="prog-row">
+            <span class="prog-label">${label}</span>
+            <span class="prog-count" id="${id}BarLabelFloat">0 / 0</span>
+        </div>
+        <div class="prog-track">
+            <div class="prog-fill" id="${id}BarFloatFill"></div>
+        </div>`;
+    document.body.appendChild(floater);
+
+    if (!_progIds.includes(id)) _progIds.push(id);
+    return wrap;
+}
+
+// Single scroll listener — checks every registered bar on scroll
+function _onProgScroll() {
+    _progIds.forEach(id => {
+        const inlineEl = document.getElementById(id + 'BarWrap');
+        const floatEl = document.getElementById(id + 'BarFloat');
+        if (!inlineEl || !floatEl) return;
+
+        // Only show if the tab containing this bar is currently active
+        const tabPanel = inlineEl.closest('.tab-panel');
+        const tabActive = tabPanel && tabPanel.classList.contains('active');
+        if (!tabActive) {
+            floatEl.classList.remove('visible');
+            return;
+        }
+
+        const rect = inlineEl.getBoundingClientRect();
+        // Show when the bottom of the inline bar has scrolled above the tab bar (~52px)
+        floatEl.classList.toggle('visible', rect.bottom < 56);
+    });
+}
+window.addEventListener('scroll', _onProgScroll, { passive: true });
+
+function updateProgressBar(id, done, total) {
+    const pct = total ? (done / total * 100) + '%' : '0%';
+
+    // Update inline
+    const bar = document.getElementById(id + 'Bar');
+    const lbl = document.getElementById(id + 'BarLabel');
+    if (bar) bar.style.width = pct;
+    if (lbl) lbl.textContent = `${done} / ${total}`;
+
+    // Update float
+    const barF = document.getElementById(id + 'BarFloatFill');
+    const lblF = document.getElementById(id + 'BarLabelFloat');
+    if (barF) barF.style.width = pct;
+    if (lblF) lblF.textContent = `${done} / ${total}`;
+
+    // Pulse the floater when an answer is given and it's visible
+    const floatEl = document.getElementById(id + 'BarFloat');
+    if (floatEl && done > 0 && floatEl.classList.contains('visible')) {
+        floatEl.classList.remove('pulse');
+        void floatEl.offsetWidth;
+        floatEl.classList.add('pulse');
+    }
+
+    // Re-evaluate visibility immediately after an answer (no need to scroll)
+    _onProgScroll();
+}
+
+function destroyProgressBar(id) {
+    const floatEl = document.getElementById(id + 'BarFloat');
+    if (floatEl) floatEl.remove();
+    const i = _progIds.indexOf(id);
+    if (i > -1) _progIds.splice(i, 1);
+}
+
+
+// ══════════════════════════════════════
+// FILL IN THE BLANKS
+// ══════════════════════════════════════
+let fibScore = 0, fibCorrectTotal = 0;
+let isAdvancedFIB = false;
+function isAnswerAcceptable(u, a) {
+    u = u.trim().toLowerCase(); a = a.trim().toLowerCase();
+    return u === a || u + 's' === a || u === a + 's';
+}
+
+function injectFIBProgressBar() {
+    if (document.getElementById('fibBarWrap')) return;
+    const wrap = document.getElementById('fibWrap');
+    if (!wrap) return;
+    const bar = createProgressBar('fib', '✏️ Fill in the Blanks — Progress ');
+    wrap.parentElement.insertBefore(bar, wrap);
+}
+
+function updateFIBProgress() {
+    updateProgressBar('fib', fibScore, fibCorrectTotal);
+    if (fibScore > 0 && fibScore >= fibCorrectTotal) {
+        setTimeout(() => showCelebration({
+            title: 'All Blanks Filled!',
+            subtitle: 'You completed every gap — great recall! 📝',
+            extra: `${fibCorrectTotal} blank${fibCorrectTotal !== 1 ? 's' : ''} answered correctly`,
+            onReset: resetFIB
+        }), 400);
+    }
+}
+
+function buildFIB() {
+    const wrap = document.getElementById('fibWrap');
+    if (!wrap) return;
+    fibCorrectTotal = fibData.reduce((a, f) => a + Object.keys(f.blanks).filter(k => f.blanks[k] !== '').length, 0);
+    document.getElementById('fibTotal').textContent = fibCorrectTotal;
+    fibData.forEach((f, fi) => {
+        const div = document.createElement('div');
+        div.className = 'fib-sentence';
+        let html = f.display, bi = 0;
+        if (!isAdvancedFIB) {
+            const correctAnswers = Object.values(f.blanks).filter(v => v !== '');
+            const distractors = fibWords.filter(w => !correctAnswers.includes(w)).sort(() => Math.random() - .5).slice(0, 4);
+            html = html.replace(/_____/g, () => {
+                const key = Object.keys(f.blanks)[bi];
+                const ans = f.blanks[key]; bi++;
+                if (!ans) return `<em>(see above)</em>`;
+                const opts = [ans, ...distractors.filter(d => d !== ans).slice(0, 3)].sort(() => Math.random() - .5);
+                const optHTML = ['— choose —', ...opts].map(o => `<option value="${o === '— choose —' ? '' : o}">${o}</option>`).join('');
+                return `<span class="blank-select" data-fi="${fi}" data-key="${key}" data-ans="${ans}"><select>${optHTML}</select></span>`;
+            });
+            div.innerHTML = html;
+        } else {
+            html = html.replace(/_____/g, () => {
+                const key = Object.keys(f.blanks)[bi];
+                const ans = f.blanks[key]; bi++;
+                if (!ans) return `<em>(see above)</em>`;
+                return `<input type="text" class="fib-input" data-fi="${fi}" data-key="${key}" data-ans="${ans}" placeholder="type here...">`;
+            });
+            div.innerHTML = html;
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'fib-check-btn'; checkBtn.innerHTML = '✓ Check Answers';
+            checkBtn.addEventListener('click', () => {
+                const inputs = div.querySelectorAll('.fib-input');
+                let allOk = true;
+                inputs.forEach(input => {
+                    if (input.disabled) return;
+                    if (isAnswerAcceptable(input.value, input.dataset.ans)) {
+                        input.classList.remove('wrong'); input.classList.add('correct');
+                        input.disabled = true; fibScore++;
+                    } else { input.classList.remove('correct'); input.classList.add('wrong'); allOk = false; }
+                });
+                document.getElementById('fibScore').textContent = fibScore;
+                if (allOk) { checkBtn.innerHTML = 'Perfect! ✨'; checkBtn.disabled = true; }
+                updateFIBProgress();
+            });
+            div.appendChild(document.createElement('br'));
+            div.appendChild(checkBtn);
+        }
+        wrap.appendChild(div);
+    });
+    if (!isAdvancedFIB && !wrap.dataset.listenerAttached) {
+        wrap.addEventListener('change', e => {
+            const sel = e.target; if (sel.tagName !== 'SELECT') return;
+            const wrapper = sel.closest('.blank-select'); if (!wrapper || wrapper.dataset.answered === 'correct') return;
+            const chosen = sel.value, ans = wrapper.dataset.ans; if (!chosen) return;
+            if (chosen === ans) {
+                wrapper.dataset.answered = 'correct'; wrapper.classList.remove('wrong'); wrapper.classList.add('correct');
+                sel.disabled = true; fibScore++;
+                document.getElementById('fibScore').textContent = fibScore;
+                updateFIBProgress();
+            } else {
+                wrapper.classList.remove('correct'); wrapper.classList.add('wrong');
+                setTimeout(() => { wrapper.classList.remove('wrong'); sel.value = ''; }, 700);
+            }
+        });
+        wrap.dataset.listenerAttached = 'true';
+    }
+    injectFIBProgressBar();
+    updateProgressBar('fib', 0, fibCorrectTotal);
+}
+function resetFIB() {
+    fibScore = 0;
+    document.getElementById('fibScore').textContent = 0;
+    document.getElementById('fibWrap').innerHTML = '';
+    destroyProgressBar('fib');
+    const old = document.getElementById('fibBarWrap');
+    if (old) old.remove();
+    buildFIB();
+}
+function injectFIBAdvancedToggle() {
+    const fibScoreEl = document.getElementById('fibScore');
+    const scoreBar = fibScoreEl ? fibScoreEl.closest('.score-bar') : null;
+    if (!scoreBar || scoreBar.querySelector('.fib-mode-toggle')) return;
+    const btn = document.createElement('button');
+    btn.className = 'fc-btn outline fib-mode-toggle';
+    btn.innerHTML = '🔥 Advanced Mode: Typing';
+    btn.addEventListener('click', () => {
+        isAdvancedFIB = !isAdvancedFIB;
+        btn.innerHTML = isAdvancedFIB ? '🔽 Standard Mode: Dropdowns' : '🔥 Advanced Mode: Typing';
+        resetFIB();
+    });
+    scoreBar.appendChild(btn);
+}
+
+// ══════════════════════════════════════
+// FLASHCARDS
+// ══════════════════════════════════════
+let activeDeck = [], fcIndex = 0, knownCards = [], unknownCards = [];
+
+function injectFCProgressBar() {
+    if (document.getElementById('fcBarWrap')) return;
+    const scoreBar = document.getElementById('fcScoreBar');
+    if (!scoreBar) return;
+    const bar = createProgressBar('fc', '🃏 Flashcards — Progress ');
+    scoreBar.after(bar);
+}
+
+function updateFCProgress() {
+    const done = knownCards.length + unknownCards.length;
+    updateProgressBar('fc', done, activeDeck.length + done);
+}
+
+function initFlashcards() {
+    if (!document.getElementById('fcTerm') || typeof flashcards === 'undefined') return;
+    activeDeck = [...flashcards];
+    injectFCProgressBar();
+    resetFlashcardsState();
+}
+function resetFlashcardsState() {
+    fcIndex = 0; knownCards = []; unknownCards = [];
+    document.getElementById('fcSummaryArea').style.display = 'none';
+    document.getElementById('fcActiveArea').style.display = 'block';
+    document.getElementById('fcScoreBar').style.display = 'flex';
+    updateProgressBar('fc', 0, activeDeck.length);
+    renderFC(); updateFCScore();
+}
+function resetFlashcards() { activeDeck = [...flashcards]; updateProgressBar("fc", 0, activeDeck.length); resetFlashcardsState(); }
+function reviewWrong() { if (unknownCards.length === 0) return; activeDeck = [...unknownCards]; resetFlashcardsState(); }
+function renderFC() {
+    const termEl = document.getElementById('fcTerm');
+    if (!termEl || activeDeck.length === 0) return;
+    const fc = activeDeck[fcIndex];
+    termEl.textContent = fc.term;
+    document.getElementById('fcDef').textContent = fc.def;
+    document.getElementById('fcProgress').textContent = `Card ${fcIndex + 1} of ${activeDeck.length}`;
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('fcNavDefault').style.display = 'flex';
+    document.getElementById('fcNavAssess').style.display = 'none';
+}
+function flipCard() {
+    const cardEl = document.getElementById('flashcard');
+    if (!cardEl) return;
+    cardEl.classList.toggle('flipped');
+    const isFlipped = cardEl.classList.contains('flipped');
+    document.getElementById('fcNavDefault').style.display = isFlipped ? 'none' : 'flex';
+    document.getElementById('fcNavAssess').style.display = isFlipped ? 'flex' : 'none';
+}
+function markCard(isKnown) {
+    if (isKnown) knownCards.push(activeDeck[fcIndex]); else unknownCards.push(activeDeck[fcIndex]);
+    updateFCScore();
+    updateFCProgress();
+    if (fcIndex < activeDeck.length - 1) {
+        fcIndex++; renderFC();
+    } else {
+        showFCSummary();
+        const perfect = unknownCards.length === 0;
+        setTimeout(() => showCelebration({
+            title: perfect ? 'Perfect Deck!' : 'Deck Complete!',
+            subtitle: perfect
+                ? 'You knew every card — outstanding! 🌟'
+                : `${knownCards.length} known, ${unknownCards.length} to review`,
+            extra: `${activeDeck.length} card${activeDeck.length !== 1 ? 's' : ''} completed`,
+            onReset: resetFlashcards
+        }), 400);
+    }
+}
+function updateFCScore() {
+    const knownEl = document.getElementById('fcKnown');
+    if (!knownEl) return;
+    knownEl.textContent = knownCards.length;
+    document.getElementById('fcUnknown').textContent = unknownCards.length;
+    document.getElementById('fcTotalTrack').textContent = activeDeck.length;
+}
+function showFCSummary() {
+    document.getElementById('fcActiveArea').style.display = 'none';
+    document.getElementById('fcSummaryArea').style.display = 'block';
+    document.getElementById('fcSummaryKnown').textContent = knownCards.length;
+    document.getElementById('fcSummaryTotal').textContent = activeDeck.length;
+    document.getElementById('btnReviewWrong').style.display = unknownCards.length > 0 ? 'inline-block' : 'none';
+}
+function nextCard() { if (!activeDeck.length) return; fcIndex = (fcIndex + 1) % activeDeck.length; renderFC(); }
+function prevCard() { if (!activeDeck.length) return; fcIndex = (fcIndex - 1 + activeDeck.length) % activeDeck.length; renderFC(); }
+
+// ══════════════════════════════════════
+// TRUE / FALSE
+// ══════════════════════════════════════
+let tfScore = 0, tfTotal = 0;
+
+function injectTFProgressBar() {
+    if (document.getElementById('tfBarWrap')) return;
+    const wrap = document.getElementById('tfWrap');
+    if (!wrap) return;
+    const bar = createProgressBar('tf', '✅ True / False — Progress ');
+    wrap.parentElement.insertBefore(bar, wrap);
+}
+
+function updateTFProgress() {
+    updateProgressBar('tf', tfTotal, tfData.length);
+    if (tfTotal > 0 && tfTotal >= tfData.length) {
+        const perfect = tfScore === tfData.length;
+        setTimeout(() => showCelebration({
+            title: perfect ? 'Full Marks!' : 'All Done!',
+            subtitle: perfect
+                ? 'Every statement answered correctly — brilliant! 🎯'
+                : `You scored ${tfScore} out of ${tfData.length}`,
+            extra: `${tfData.length} statement${tfData.length !== 1 ? 's' : ''} completed`,
+            onReset: resetTF
+        }), 400);
+    }
+}
+
+function buildTF() {
+    const wrap = document.getElementById('tfWrap');
+    if (!wrap) return;
+    tfData.forEach((item, i) => {
+        const card = document.createElement('div'); card.className = 'tf-card';
+        card.innerHTML = `<div><div class="tf-text">${item.statement}</div><div class="tf-explanation" id="tfExp-${i}">${item.explanation}</div></div>
+<div class="tf-btns"><button class="tf-btn" data-i="${i}" data-val="true">TRUE</button><button class="tf-btn" data-i="${i}" data-val="false">FALSE</button></div>`;
+        wrap.appendChild(card);
+    });
+    wrap.addEventListener('click', e => {
+        const btn = e.target.closest('.tf-btn'); if (!btn) return;
+        const i = +btn.dataset.i; const card = btn.closest('.tf-card');
+        if (card.dataset.answered) return;
+        card.dataset.answered = 1;
+        const val = btn.dataset.val === 'true'; const correct = val === tfData[i].answer; tfTotal++;
+        card.querySelectorAll('.tf-btn').forEach(b => b.disabled = true);
+        if (correct) { btn.classList.add('correct'); tfScore++; }
+        else { btn.classList.add('wrong'); card.querySelectorAll('.tf-btn').forEach(b => { if (b.dataset.val === String(tfData[i].answer)) b.classList.add('correct'); }); }
+        document.getElementById(`tfExp-${i}`).classList.add('show');
+        document.getElementById('tfScore').textContent = tfScore;
+        document.getElementById('tfTotal').textContent = tfTotal;
+        updateTFProgress();
+    });
+    injectTFProgressBar();
+    updateProgressBar('tf ', 0, tfData.length);
+}
+function resetTF() {
+    tfScore = 0; tfTotal = 0;
+    document.getElementById('tfScore').textContent = 0;
+    document.getElementById('tfTotal').textContent = 0;
+    document.getElementById('tfWrap').innerHTML = '';
+    destroyProgressBar('tf');
+    const old = document.getElementById('tfBarWrap');
+    if (old) old.remove();
+    buildTF();
+}
+
+// ══════════════════════════════════════
+// EXAM PRACTICE
+// ══════════════════════════════════════
+let epRevealed = 0;
+
+function injectEPProgressBar() {
+    if (document.getElementById('epBarWrap')) return;
+    const list = document.getElementById('epList');
+    if (!list) return;
+    const bar = createProgressBar('ep', '📝 Exam Practice — Questions Attempted');
+    list.parentElement.insertBefore(bar, list);
+}
+
+function updateEPProgress() {
+    updateProgressBar('ep', epRevealed, examQuestions.length);
+    if (epRevealed > 0 && epRevealed >= examQuestions.length) {
+        setTimeout(() => showCelebration({
+            title: 'Practice Complete!',
+            subtitle: 'You worked through every exam question — well done! 📋',
+            extra: `${examQuestions.length} question${examQuestions.length !== 1 ? 's' : ''} attempted`,
+            onReset: () => {
+                epRevealed = 0;
+                document.getElementById('epList').innerHTML = '';
+                destroyProgressBar('ep');
+                const old = document.getElementById('epBarWrap');
+                if (old) old.remove();
+                buildExamPractice();
+            }
+        }), 400);
+    }
+}
 function buildMisc() {
     const list = document.getElementById('miscList');
     if (!list) return;
@@ -634,94 +1198,6 @@ function buildTips() {
     injectExpandAll('tab-examtips', 'tipsGrid', 'tip-card');
 }
 
-// ── FLASHCARDS ──
-let activeDeck = [], fcIndex = 0, knownCards = [], unknownCards = [];
-function initFlashcards() {
-    if (!document.getElementById('fcTerm') || typeof flashcards === 'undefined') return;
-    activeDeck = [...flashcards]; resetFlashcardsState();
-}
-function resetFlashcardsState() {
-    fcIndex = 0; knownCards = []; unknownCards = [];
-    document.getElementById('fcSummaryArea').style.display = 'none';
-    document.getElementById('fcActiveArea').style.display = 'block';
-    document.getElementById('fcScoreBar').style.display = 'flex';
-    renderFC(); updateFCScore();
-}
-function resetFlashcards() { activeDeck = [...flashcards]; resetFlashcardsState(); }
-function reviewWrong() { if (unknownCards.length === 0) return; activeDeck = [...unknownCards]; resetFlashcardsState(); }
-function renderFC() {
-    const termEl = document.getElementById('fcTerm');
-    if (!termEl || activeDeck.length === 0) return;
-    const fc = activeDeck[fcIndex];
-    termEl.textContent = fc.term;
-    document.getElementById('fcDef').textContent = fc.def;
-    document.getElementById('fcProgress').textContent = `Card ${fcIndex + 1} of ${activeDeck.length}`;
-    document.getElementById('flashcard').classList.remove('flipped');
-    document.getElementById('fcNavDefault').style.display = 'flex';
-    document.getElementById('fcNavAssess').style.display = 'none';
-}
-function flipCard() {
-    const cardEl = document.getElementById('flashcard');
-    if (!cardEl) return;
-    cardEl.classList.toggle('flipped');
-    const isFlipped = cardEl.classList.contains('flipped');
-    document.getElementById('fcNavDefault').style.display = isFlipped ? 'none' : 'flex';
-    document.getElementById('fcNavAssess').style.display = isFlipped ? 'flex' : 'none';
-}
-function markCard(isKnown) {
-    if (isKnown) knownCards.push(activeDeck[fcIndex]); else unknownCards.push(activeDeck[fcIndex]);
-    updateFCScore();
-    if (fcIndex < activeDeck.length - 1) { fcIndex++; renderFC(); } else showFCSummary();
-}
-function updateFCScore() {
-    const knownEl = document.getElementById('fcKnown');
-    if (!knownEl) return;
-    knownEl.textContent = knownCards.length;
-    document.getElementById('fcUnknown').textContent = unknownCards.length;
-    document.getElementById('fcTotalTrack').textContent = activeDeck.length;
-}
-function showFCSummary() {
-    document.getElementById('fcActiveArea').style.display = 'none';
-    document.getElementById('fcSummaryArea').style.display = 'block';
-    document.getElementById('fcSummaryKnown').textContent = knownCards.length;
-    document.getElementById('fcSummaryTotal').textContent = activeDeck.length;
-    document.getElementById('btnReviewWrong').style.display = unknownCards.length > 0 ? 'inline-block' : 'none';
-}
-function nextCard() { if (!activeDeck.length) return; fcIndex = (fcIndex + 1) % activeDeck.length; renderFC(); }
-function prevCard() { if (!activeDeck.length) return; fcIndex = (fcIndex - 1 + activeDeck.length) % activeDeck.length; renderFC(); }
-
-// ── BUILD TRUE/FALSE ──
-let tfScore = 0, tfTotal = 0;
-function buildTF() {
-    const wrap = document.getElementById('tfWrap');
-    if (!wrap) return;
-    tfData.forEach((item, i) => {
-        const card = document.createElement('div'); card.className = 'tf-card';
-        card.innerHTML = `<div><div class="tf-text">${item.statement}</div><div class="tf-explanation" id="tfExp-${i}">${item.explanation}</div></div>
-<div class="tf-btns"><button class="tf-btn" data-i="${i}" data-val="true">TRUE</button><button class="tf-btn" data-i="${i}" data-val="false">FALSE</button></div>`;
-        wrap.appendChild(card);
-    });
-    wrap.addEventListener('click', e => {
-        const btn = e.target.closest('.tf-btn'); if (!btn) return;
-        const i = +btn.dataset.i; const card = btn.closest('.tf-card');
-        if (card.dataset.answered) return;
-        card.dataset.answered = 1;
-        const val = btn.dataset.val === 'true'; const correct = val === tfData[i].answer; tfTotal++;
-        card.querySelectorAll('.tf-btn').forEach(b => b.disabled = true);
-        if (correct) { btn.classList.add('correct'); tfScore++; }
-        else { btn.classList.add('wrong'); card.querySelectorAll('.tf-btn').forEach(b => { if (b.dataset.val === String(tfData[i].answer)) b.classList.add('correct'); }); }
-        document.getElementById(`tfExp-${i}`).classList.add('show');
-        document.getElementById('tfScore').textContent = tfScore;
-        document.getElementById('tfTotal').textContent = tfTotal;
-    });
-}
-function resetTF() {
-    tfScore = 0; tfTotal = 0;
-    document.getElementById('tfScore').textContent = 0;
-    document.getElementById('tfTotal').textContent = 0;
-    document.getElementById('tfWrap').innerHTML = '';
-    buildTF();
-}
 
 // ── BUILD EXAM PRACTICE ──
 function buildExamPractice() {
@@ -758,6 +1234,7 @@ ${q.modelAnswer ? `<div class="marks-section"><h5>✓ Model Answer</h5><div clas
 </div>`;
         list.appendChild(card);
     });
+    // MCQ auto-reveal on click
     list.addEventListener('click', e => {
         const btn = e.target.closest('.ep-opt'); if (!btn) return;
         const qi = +btn.dataset.qi, oi = +btn.dataset.oi;
@@ -769,7 +1246,10 @@ ${q.modelAnswer ? `<div class="marks-section"><h5>✓ Model Answer</h5><div clas
         btn.classList.add(oi === examQuestions[qi].answer ? 'ep-correct' : 'ep-wrong');
         if (oi !== examQuestions[qi].answer) allOpts[examQuestions[qi].answer].classList.add('ep-correct');
         document.getElementById(`epMarks-${qi}`).classList.add('show');
+        epRevealed++; updateEPProgress();
     });
+    injectEPProgressBar();
+    updateProgressBar('ep', 0, examQuestions.length);
 }
 function togglePop(qi, type) {
     const hint = document.getElementById(`epHint-${qi}`);
@@ -777,7 +1257,16 @@ function togglePop(qi, type) {
     const marks = document.getElementById(`epMarks-${qi}`);
     if (type === 'hint') { hint.classList.toggle('show'); starter.classList.remove('show'); }
     else if (type === 'starter') { starter.classList.toggle('show'); hint.classList.remove('show'); }
-    else if (type === 'marks') { marks.classList.toggle('show'); }
+    else if (type === 'marks') {
+        const wasHidden = !marks.classList.contains('show');
+        marks.classList.toggle('show');
+        // Count as attempted the first time the mark scheme is revealed
+        const card = marks.closest('.ep-card');
+        if (wasHidden && !card.dataset.epRevealed) {
+            card.dataset.epRevealed = 1;
+            epRevealed++; updateEPProgress();
+        }
+    }
 }
 
 // ── SCROLL TO TOP ──
